@@ -22,7 +22,7 @@
 - **Concept 1:** Short explanation
 - **Concept 2:** Short explanation
 
-### 🔸 Cool Commands
+### 🔸 Commands
 
 ```bash
 # useful command example
