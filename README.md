@@ -10,6 +10,7 @@ Welcome to my TryHackMe learning repository! Here, I document all my progress, n
 - **`challenges/`**: Harder or more complex challenges I’ve taken on, including any problems I encountered.
 
 
+
 ## 🎯 Goals
 - Complete the **Cybersecurity 101** path on TryHackMe.
 - Complete the **Security Analyst** path on TryHackMe.
