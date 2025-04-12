@@ -1,0 +1,88 @@
+# TryHackMe: [Intro to Log Analysis]
+
+🔗 [Room Link](https://tryhackme.com/room/introtologanalysis)
+
+
+
+## 🔍 Key Notes
+
+    Web Servers:
+        Nginx:
+            Access Logs: /var/log/nginx/access.log
+            Error Logs: /var/log/nginx/error.log
+        Apache:
+            Access Logs: /var/log/apache2/access.log
+            Error Logs: /var/log/apache2/error.log
+
+    Databases:
+        MySQL:
+            Error Logs: /var/log/mysql/error.log
+        PostgreSQL:
+            Error and Activity Logs: /var/log/postgresql/postgresql-{version}-main.log
+
+    Web Applications:
+        PHP:
+            Error Logs: /var/log/php/error.log
+
+    Operating Systems:
+        Linux:
+            General System Logs: /var/log/syslog
+            Authentication Logs: /var/log/auth.log
+
+    Firewalls and IDS/IPS:
+        iptables:
+            Firewall Logs: /var/log/iptables.log
+        Snort:
+            Snort Logs: /var/log/snort/
+
+
+
+### 🔸 Tools Used
+
+- *RegExr
+- **Cyberchef
+
+
+
+### 🔸 Concepts
+
+- *Concept 1: RegExr is an online tool to help teach, build, and test regular expression patterns. We can use the following pattern: \b([0-9]{1,3}\.){3}[0-9]{1,3}\b 
+
+    [0-9]{1,3} - Matches one to three digits to match numbers from 0 to 999. While IPv4 addresses octets cannot exceed 255, this simplified pattern works for our use case.
+    \. - Escapes and matches a literal . character in the IP address.
+    {3} - Specifies that the previous capturing group ([0-9]{1,3}\.) should be repeated three times.
+    [0-9]{1,3} - Again, this matches numbers from 0 to 999, completing the fourth octet of the IP address.
+
+- **Concept 2: Cyberchef is a web-based tool that allows you to perform various data transformations and analysis.
+
+
+
+### 🔸 Commands
+
+less - Command to view the contents of a log file with scrolling. It allows navigating through large files.
+
+tail -f -n 5 apache.log - Displays the last 5 lines of apache.log and keeps updating the output as new entries are added. Useful for monitoring real-time log entries.
+
+wc apache.log  - Counts the number of lines, words, and characters in the apache.log file. wc stands for "word count."
+
+cut -d ' ' -f 1 apache.log | sort -n -r - Extracts the first field (IP address) from apache.log, sorts it in reverse numerical order. The -d option specifies the delimiter (space), and -f 1 selects the first field.
+
+cut -d ' ' -f 1 apache.log | sort -n -r | uniq - Similar to the previous command, but this one eliminates duplicate IP addresses (uniq removes repeated lines).
+
+sed 's/31\/Jul\/2023/July 31, 2023/g' apache.log - Uses sed to replace a date format in apache.log (31/Jul/2023 becomes July 31, 2023). The g at the end makes the substitution global (i.e., it replaces all occurrences).
+
+awk '$9 >= 400' apache.log - Filters apache.log to show only entries where the status code (field 9) is greater than or equal to 400 (which typically indicates an error).
+
+grep -c "admin" apache.log - Counts how many times the word "admin" appears in apache.log. The -c option tells grep to return only the count.
+
+grep -n "admin" apache.log - Searches for the word "admin" in apache.log and shows the line numbers where it appears.
+
+grep -v "/index.php" apache.log | grep "203.64.78.90" - This command first excludes lines containing /index.php (-v negates the match) and then searches for the IP address 203.64.78.90 in the remaining lines.
+
+grep -E 'post=1[0-9]' apache-ex2.log - Searches apache-ex2.log for lines where post= is followed by any number starting from 10 (i.e., 10 to 19). The -E enables extended regular expressions for more complex patterns.
+
+
+
+
+
+
