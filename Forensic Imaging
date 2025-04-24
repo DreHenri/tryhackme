@@ -1,0 +1,83 @@
+**important history location
+set -o history
+	Enables command history in the shell, allowing it to record the commands you enter.
+
+shopt -s histappend
+	Ensures that the command history is appended to the history file instead of overwriting it when the shell exits.
+
+export HISTCONTROL=
+	Clears any settings that control which commands are saved in the history, ensuring all commands are recorded.
+
+export HISTIGNORE=
+	Clears any settings that ignore specific patterns of commands, so all commands are saved in the history.
+
+export HISTFILE=~/.bash_history
+	Sets the file where the command history is saved.
+
+export HISTFILESIZE=-1
+	Sets no limit on the number of lines stored in the history file.
+
+export HISTSIZE=-1
+	Sets no limit on the number of commands retained in the shell history.
+
+export HISTTIMEFORMAT="%F-%R "
+	
+Formats timestamps in the history as "YYYY-MM-DD HH" for each command.
+
+lsblk -l
+lsblk -  list the block devices on the system
+-l - list the devices
+
+df
+Command to see the attached devices on the target machine.
+
+
+
+**how to create a image**
+dd
+	A standard Unix utility for copying and converting files, often used for creating raw disk images
+
+dc3dd
+	An enhanced version of dd with additional features for forensic imaging, including hashing and logging
+-The if option (input file), indicates the device we want to copy
+-The of option (output file) indicates where we want to write the disk bytes
+-The log options will save all the output into a file.
+EXAMPLE: dc3dd if=/dev/loop10 of=example1.img log=imaging_loop10.txt
+
+ddrescue
+	A data recovery tool that efficiently copies data from damaged drives, attempting to rescue as much data as possible
+
+FTK Imager
+	A GUI-based tool for creating forensic images, widely used for its ease of use and comprehensive features
+
+Guymager
+	A GUI-based forensic imaging tool that supports various image formats and provides detailed logs
+
+EWF tools (ewfacquire)
+	 Tools for creating and handling Expert Witness Format (EWF) images, often used in digital forensics
+
+
+
+**how to integrity check**
+md5sum file
+sha1sum
+sha256sum
+
+
+
+**how to mount & access the image**
+First, create a mount point directory /mnt/example1  with the command: sudo mkdir -p /mnt/example1
+Then, use the command: sudo mount -o loop example1.img /mnt/example1 to mount the image
+After that, we can verify by exploring the mount point we created using the ls command.
+
+
+
+
+
+
+
+
+
+
+
+
