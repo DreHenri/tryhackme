@@ -1,0 +1,58 @@
+ARP Poisoning/Spoofing (A.K.A. Man In The Middle Attack)
+
+Global search - arp
+Opcode 1: ARP requests - arp.opcode == 1
+Opcode 2: ARP responses - arp.opcode == 2
+Hunt: Arp scanning - arp.dst.hw_mac==00:00:00:00:00:00
+Hunt: Possible ARP poisoning detection - arp.duplicate-address-detected or arp.duplicate-address-frame
+Hunt: Possible ARP flooding from detection - ((arp) && (arp.opcode == 1)) && (arp.src.hw_mac == target-mac-address)
+
+
+
+DHCP Analysis
+
+Global search - dhcp or bootp
+"DHCP Request" packets contain the hostname information - dhcp.option.dhcp == 3
+"DHCP ACK" packets represent the accepted requests - dhcp.option.dhcp == 5
+"DHCP NAK" packets represent denied requests - dhcp.option.dhcp == 6
+"DHCP Request" options for grabbing the low-hanging fruits - dhcp.option.hostname contains "keyword"
+"DHCP ACK" options for grabbing the low-hanging fruits: - dhcp.option.domain_name contains "keyword"
+
+
+
+NetBIOS (NBNS) Analysis
+
+Global search - nbns
+"NBNS" options for grabbing the low-hanging fruits - nbns.name contains "keyword"
+
+
+
+Kerberos Analysis
+
+Global search - kerberos
+User account search: CNameString: The username - kerberos.CNameString contains "keyword"  ;  kerberos.CNameString and !(kerberos.CNameString contains "$" )
+
+
+
+ICMP Analysis 
+
+Global search - icmp
+"ICMP" options for grabbing the low-hanging fruits: Packet length, ICMP destination addresses, Encapsulated protocol signs in ICMP payload - data.len > 64 and icmp
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
