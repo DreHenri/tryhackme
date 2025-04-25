@@ -1,0 +1,79 @@
+OS release information - /etc/os-release
+
+User accounts - /etc/passwd  ;  cat /etc/passwd| column -t -s :
+
+Group Information - /etc/group
+
+passwords - /etc/shadow
+
+Sudoers List - /etc/sudoers
+
+Login information -  /var/log/wtmp  ;  /var/log/btmp 
+btmp file saves information about failed logins
+wtmp keeps historical data of logins
+These files are not regular text files that can be read using cat, less or vim; instead, they are binary files, which have to be read using the last
+
+Authentication logs - /var/log/auth.log
+It can be read using the cat utility, however, given the size of the file, we can use tail, head, more or less utilities to make it easier to read. 
+
+Hostname - /etc/hostname
+
+Timezone -  /etc/timezone
+
+Network Configuration - /etc/network/interfaces
+
+Active network connections - netstat
+
+Running processes - ps aux
+
+DNS information - /etc/hosts
+The file /etc/hosts contains the configuration for the DNS name assignment.
+The information about DNS servers that a Linux host talks to for DNS resolution is stored in the resolv.conf file. Its location is /etc/resolv.conf
+
+
+Cron jobs - /etc/crontab
+Cron jobs are commands that run periodically after a set amount of time.
+
+Service startup - /etc/init.d
+Like Windows, services can be set up in Linux that will start and run in the background after every system boot. A list of services can be found in the /etc/init.d directory. 
+
+.Bashrc - ~/.bashrc
+When a bash shell is spawned, it runs the commands stored in the .bashrc file. This file can be considered as a startup list of actions to be performed. Hence it can prove to be a good place to look for persistence. 
+System-wide settings are stored in /etc/bash.bashrc and /etc/profile files, so it is often a good idea to take a look at these files as well.
+
+
+Sudo execution history - /var/log/auth.log
+All the commands that are run on a Linux host using sudo are stored in the auth log.
+cat /var/log/auth.log* |grep -i COMMAND|tail
+
+Bash history - ~/.bash_history 
+Any commands other than the ones run using sudo are stored in the bash history. Every user's bash history is stored separately in that user's home folder.
+
+Files accessed using vim - ~/.viminfo
+The Vim text editor stores logs for opened files in Vim in the file named .viminfo in the home directory.
+
+Syslog - /var/log/syslog
+The Syslog contains messages that are recorded by the host about system activity.
+Since the Syslog is a huge file, it is easier to use tail, head, more or less utilities to help make it more readable.
+
+Third-party logs - /var/log/
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
