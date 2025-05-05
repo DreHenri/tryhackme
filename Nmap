@@ -18,6 +18,7 @@
 
 --script=ftp-anon (Checks if anonymous login is allowed on an FTP server. If successful, it will list any readable files or directories.)
 
+-sV (Version Enumeration)
 
 
 
