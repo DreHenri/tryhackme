@@ -1,0 +1,56 @@
+**Commands**
+
+-sT (TCP Connect Scan): Performs a full TCP connection using the OS's connect() call — easiest but noisier.
+
+-sS (SYN Scan): Sends SYN packets to start connections but doesn’t complete them — stealthier and faster.
+
+-sU (UDP Scan): Sends UDP packets to detect open UDP ports — slower and less reliable due to no response on open ports.
+
+-sN (TCP Null Scan): Sends packets with no flags set — evades some firewalls, used for OS detection. The -sn switch tells Nmap not to scan any ports -- forcing it to rely primarily on ICMP echo packets
+
+-sF (TCP FIN Scan): Sends FIN flag packets to closed ports — stealthy and can bypass some filters.
+
+-sX (TCP Xmas Scan): Sends packets with FIN, PSH, and URG flags — used to confuse or bypass stateless firewalls.
+
+
+
+
+**Nmap Scripting Engine (NSE)**
+
+Categories:
+    safe:- Won't affect the target
+    intrusive:- Not safe: likely to affect the target
+    vuln:- Scan for vulnerabilities
+    exploit:- Attempt to exploit a vulnerability
+    auth:- Attempt to bypass authentication for running services (e.g. Log into an FTP server anonymously)
+    brute:- Attempt to bruteforce credentials for running services
+    discovery:- Attempt to query running services for further information about the network (e.g. query an SNMP server).
+
+Example1:
+When you use --script=<script-name>, like: 
+nmap --script=http-fileupload-exploiter -p 80 <target>
+Nmap looks for the script in its default script library, located in: /usr/share/nmap/scripts/
+
+Multiple scripts can be run simultaneously in this fashion by separating them by a comma. For example: --script=smb-enum-users,smb-enum-shares
+
+Example2:
+nmap -p 80 --script http-put --script-args http-put.url='/dav/shell.php',http-put.file='./shell.php'
+
+http-put script (used to upload files using the PUT method)
+This takes two arguments: the URL to upload the file to, and the file's location on disk.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
