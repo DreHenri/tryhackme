@@ -27,3 +27,62 @@ nmap -PE -sn MACHINE_IP/24
 -PE (option required to tell Nmap to use ICMP Echo to discover live hosts)
 
 
+
+
+**TCP**
+nmap -PS (TCP SYN ping)
+Example: 
+-PS21 will target port 21
+-PS21-25 will target ports 21, 22, 23, 24, and 25
+-PS80,443,8080 will target the three ports 80, 443, and 8080
+
+nmap -PA (TCP ACK ping)
+Example: 
+-PA21, -PA21-25 and -PA80,443,8080
+
+
+
+
+**UDP**
+nmap -PU
+sudo nmap -PU -sn
+-sn: Tells Nmap to perform host discovery only — no port scanning.
+Sends UDP ping probes (by default to port 40125) to check if the host is up
+
+
+
+
+**masscan**
+Masscan is quite aggressive with the rate of packets it generates. The syntax is quite similar: -p can be followed by a port number, list, or range.
+
+masscan MACHINE_IP/24 -p443
+
+
+
+
+**Reverse-DNS Lookup**
+-n	❌ Skip reverse DNS lookups (faster, stealthier).
+-R	🔍 Do DNS lookups for all hosts, even if they’re offline.
+--dns-servers <IP>	🌐 Use a specific DNS server instead of the system default.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
