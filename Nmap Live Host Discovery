@@ -1,0 +1,29 @@
+**Live Hosts**
+nmap -sL TARGETS (If you want to check the list of hosts that Nmap will scan)
+
+Example:
+namp -sL 10.10.0-255.101-125
+
+
+
+
+**ARP**
+nmap -PR -sn MACHINE_IP/24 (-PR indicates that you only want an ARP scan)
+
+arp-scan --localnet  OR  arp-scan -l 
+(This command will send ARP queries to all valid IP addresses on your local networks.)
+
+
+
+
+**ICMP**
+To use ICMP echo request to discover live hosts, add the option -PE. (Remember to add -sn if you don’t want to follow that with a port scan)
+nmap -PE -sn MACHINE_IP/24
+
+-PP (option required to tell Nmap to use ICMP Timestamp to discover live hosts)
+
+-PM (option required to tell Nmap to use ICMP Address Mask to discover live hosts)
+
+-PE (option required to tell Nmap to use ICMP Echo to discover live hosts)
+
+
