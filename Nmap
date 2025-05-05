@@ -12,6 +12,10 @@
 
 -sX (TCP Xmas Scan): Sends packets with FIN, PSH, and URG flags — used to confuse or bypass stateless firewalls.
 
+-v (Verbosity and more information about the scan)
+
+-oN (Save normal output)
+
 
 
 
