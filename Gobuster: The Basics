@@ -1,0 +1,153 @@
+Enumeration
+
+Enumeration is the act of listing all the available resources, whether they are accessible or not. For example, Gobuster enumerates web directories.
+
+
+Brute Force
+
+Brute force is the act of trying every possibility until a match is found. It is like having ten keys and trying them all on a lock until one fits. Gobuster uses wordlists for this purpose.
+
+
+
+Commands:
+
+gobuster --help
+Usage:
+  gobuster [command]
+
+Available Commands:
+  completion  Generate the autocompletion script for the specified shell
+  dir         Uses directory/file enumeration mode
+  dns         Uses DNS subdomain enumeration mode
+  fuzz        Uses fuzzing mode. Replaces the keyword FUZZ in the URL, Headers and the request body
+  gcs         Uses gcs bucket enumeration mode
+  help        Help about any command
+  s3          Uses aws bucket enumeration mode
+  tftp        Uses TFTP enumeration mode
+  version     shows the current version
+  vhost       Uses VHOST enumeration mode (you most probably want to use the IP address as the URL parameter)
+
+Flags:
+      --debug                 Enable debug output
+      --delay duration        Time each thread waits between requests (e.g. 1500ms)
+  -h, --help                  help for gobuster
+      --no-color              Disable color output
+      --no-error              Don't display errors
+  -z, --no-progress           Don't display progress
+  -o, --output string         Output file to write results to (defaults to stdout)
+  -p, --pattern string        File containing replacement patterns
+  -q, --quiet                 Don't print the banner and other noise
+  -t, --threads int           Number of concurrent threads (default 10)
+  -v, --verbose               Verbose output (errors)
+  -w, --wordlist string       Path to the wordlist. Set to - to use STDIN.
+      --wordlist-offset int   Resume from a given position in the wordlist (defaults to 0)
+
+Use "gobuster [command] --help" for more information about a command.
+
+
+
+-t 	--threads 	 This flag configures the number of threads to use for the scan. Each of these threads sends out requests with a slight delay. The default number of threads is 10. This number may be slow when using large wordlists. You can increase or decrease the number of threads depending on the available system resources.
+-w 	--wordlist 	 The flag configures a wordlist to use for iterating. Each wordlist entry is attached to the URL you included in the command.
+	  --delay 	   This flag defines the amount of time to wait between sending requests. Some web servers include mechanisms to detect enumeration by looking at how many requests are received in a certain period of time. We can increase the delay between subsequent requests to make it look like normal web traffic.
+	  --debug 	   This flag helps us to troubleshoot when our command gives unexpected errors.
+-o 	--output 	   This flag writes the enumeration results to a file we choose.
+
+
+Example: 
+gobuster dir -u "http://www.example.thm/" -w /usr/share/wordlists/dirb/small.txt -t 64
+
+
+
+
+
+Many flags are used to fine-tune the gobuster dir command:
+
+dir flags:
+
+| Flag | Long Flag              | Description |
+|------|------------------------|-------------|
+| `-c` | `--cookies`            | Configures a cookie to pass along with each request, such as a session ID. |
+| `-x` | `--extensions`         | Specifies which file extensions to scan for (e.g., `.php`, `.js`). |
+| `-H` | `--headers`            | Configures a full custom header to include in each request. |
+| `-k` | `--no-tls-validation`  | Skips TLS certificate validation (useful for self-signed certs in CTFs). |
+| `-n` | `--no-status`          | Suppresses status code output to keep the display cleaner. |
+| `-P` | `--password`           | Password for basic auth (used with `--username`). |
+| `-s` | `--status-codes`       | Only show responses with specific status codes (e.g., `200`, or a range like `300-400`). |
+| `-b` | `--status-codes-blacklist` | Hide responses with specific status codes (overrides `-s`). |
+| `-U` | `--username`           | Username for basic auth (used with `--password`). |
+| `-r` | `--followredirect`     | Follows HTTP redirects (e.g., status codes 301 or 302). |
+
+Example:
+gobuster dir -u "http://www.example.thm" -w /usr/share/wordlists/dirbuster/directory-list-2.3-medium.txt -r
+
+
+
+
+
+dns
+
+dns flags:
+
+| Flag | Long Flag       | Description |
+|------|------------------|-------------|
+| `-c` | `--show-cname`   | Show CNAME records (cannot be used with the `-i` flag). |
+| `-i` | `--show-ips`     | Show IP addresses that the domain and subdomains resolve to. |
+| `-r` | `--resolver`     | Use a custom DNS server for resolving. |
+| `-d` | `--domain`       | Specify the target domain for enumeration. |
+
+
+
+
+
+Vhost
+
+This mode allows Gobuster to brute force virtual hosts. Virtual hosts are different websites on the same machine. Sometimes, they look like subdomains, but don’t be deceived! Virtual hosts are IP-based and are running on the same server. Subdomains are set up in DNS. The  difference between vhost and dns mode is in the way Gobuster scans:
+
+    vhost mode will navigate to the URL created by combining the configured HOSTNAME (-u flag) with an entry of a wordlist.
+    dns mode will do a DNS lookup to the FQDN created by combining the configured domain name (-d flag) with an entry of a wordlist.
+
+Vhost flags:
+
+| Flag  | Long Flag           | Description |
+|-------|----------------------|-------------|
+| `-u`  | `--url`              | Specifies the base URL (target domain) for brute-forcing virtual hostnames. |
+|       | `--append-domain`    | Appends the base domain to each word in the wordlist (e.g., `word.example.com`). |
+| `-m`  | `--method`           | Specifies the HTTP method to use for requests (e.g., `GET`, `POST`). |
+|       | `--domain`           | Appends a domain to each wordlist entry to form a valid hostname (useful if not provided explicitly). |
+|       | `--exclude-length`   | Excludes results based on the length of the response body (helps filter out false positives). |
+| `-r`  | `--follow-redirect`  | Follows HTTP redirects (helpful when subdomains redirect to different URLs). |
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
