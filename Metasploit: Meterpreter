@@ -1,0 +1,186 @@
+Meterpreter will run on the target system and act as an agent within a command and control architecture. You will interact with the target operating system and files and use Meterpreter's specialized commands.
+
+Meterpreter runs on the target system but is not installed on it. It runs in memory and does not write itself to the disk on the target.
+
+
+
+getpid command returns the process ID with which Meterpreter is running.
+
+EX:
+meterpreter > getpid 
+Current pid: 1304
+
+If we list processes running on the target system using the ps command, we see PID 1304 is spoolsv.exe and not Meterpreter.exe, as one might expect.
+
+
+
+
+
+
+msfvenom --list payloads | grep meterpreter
+
+           
+root@ip-10-10-186-44:~# msfvenom --list payloads | grep meterpreter
+    android/meterpreter/reverse_http                    Run a meterpreter server in Android. Tunnel communication over HTTP
+    android/meterpreter/reverse_https                   Run a meterpreter server in Android. Tunnel communication over HTTPS
+    android/meterpreter/reverse_tcp                     Run a meterpreter server in Android. Connect back stager
+    android/meterpreter_reverse_http                    Connect back to attacker and spawn a Meterpreter shell
+    android/meterpreter_reverse_https                   Connect back to attacker and spawn a Meterpreter shell
+    android/meterpreter_reverse_tcp                     Connect back to the attacker and spawn a Meterpreter shell
+    apple_ios/aarch64/meterpreter_reverse_http          Run the Meterpreter / Mettle server payload (stageless)
+    apple_ios/aarch64/meterpreter_reverse_https         Run the Meterpreter / Mettle server payload (stageless)
+    apple_ios/aarch64/meterpreter_reverse_tcp           Run the Meterpreter / Mettle server payload (stageless)
+    apple_ios/armle/meterpreter_reverse_http            Run the Meterpreter / Mettle server payload (stageless)
+    apple_ios/armle/meterpreter_reverse_https           Run the Meterpreter / Mettle server payload (stageless)
+    apple_ios/armle/meterpreter_reverse_tcp             Run the Meterpreter / Mettle server payload (stageless)
+    java/meterpreter/bind_tcp                           Run a meterpreter server in Java. Listen for a connection
+    java/meterpreter/reverse_http                       Run a meterpreter server in Java. Tunnel communication over HTTP
+    java/meterpreter/reverse_https                      Run a meterpreter server in Java. Tunnel communication over HTTPS
+    java/meterpreter/reverse_tcp                        Run a meterpreter server in Java. Connect back stager
+    linux/aarch64/meterpreter/reverse_tcp               Inject the mettle server payload (staged). Connect back to the attacker
+    linux/aarch64/meterpreter_reverse_http              Run the Meterpreter / Mettle server payload (stageless)
+    linux/aarch64/meterpreter_reverse_https             Run the Meterpreter / Mettle server payload (stageless)
+    linux/aarch64/meterpreter_reverse_tcp               Run the Meterpreter / Mettle server payload (stageless)
+    linux/armbe/meterpreter_reverse_http                Run the Meterpreter / Mettle server payload (stageless)
+    linux/armbe/meterpreter_reverse_https               Run the Meterpreter / Mettle server payload (stageless)
+    linux/armbe/meterpreter_reverse_tcp                 Run the Meterpreter / Mettle server payload (stageless)
+    linux/armle/meterpreter/bind_tcp                    Inject the mettle server payload (staged). Listen for a connection
+    linux/armle/meterpreter/reverse_tcp                 Inject the mettle server payload (staged). Connect back to the attacker [...]
+
+        
+
+
+
+
+meterpreter > help
+
+Core Commands
+=============
+
+    Command                   Description
+    -------                   -----------
+    ?                         Help menu
+    background                Backgrounds the current session
+    bg                        Alias for background
+    bgkill                    Kills a background meterpreter script
+    bglist                    Lists running background scripts
+    bgrun                     Executes a meterpreter script as a background thread
+    channel                   Displays information or control active channels
+    close                     Closes a channel[...]
+
+
+
+
+
+
+
+
+
+
+Meterpreter commands
+
+
+Core commands
+
+    background: Backgrounds the current session
+    exit: Terminate the Meterpreter session
+    guid: Get the session GUID (Globally Unique Identifier)
+    help: Displays the help menu
+    info: Displays information about a Post module
+    irb: Opens an interactive Ruby shell on the current session
+    load: Loads one or more Meterpreter extensions
+    migrate: Allows you to migrate Meterpreter to another process
+    run: Executes a Meterpreter script or Post module
+    sessions: Quickly switch to another session
+
+File system commands
+
+    cd: Will change directory
+    ls: Will list files in the current directory (dir will also work)
+    pwd: Prints the current working directory
+    edit: will allow you to edit a file
+    cat: Will show the contents of a file to the screen
+    rm: Will delete the specified file
+    search: Will search for files
+    upload: Will upload a file or directory
+    download: Will download a file or directory
+
+Networking commands
+
+    arp: Displays the host ARP (Address Resolution Protocol) cache
+    ifconfig: Displays network interfaces available on the target system
+    netstat: Displays the network connections
+    portfwd: Forwards a local port to a remote service
+    route: Allows you to view and modify the routing table
+
+System commands
+
+    clearev: Clears the event logs
+    execute: Executes a command
+    getpid: Shows the current process identifier
+    getuid: Shows the user that Meterpreter is running as
+    kill: Terminates a process
+    pkill: Terminates processes by name
+    ps: Lists running processes
+    reboot: Reboots the remote computer
+    shell: Drops into a system command shell
+    shutdown: Shuts down the remote computer
+    sysinfo: Gets information about the remote system, such as OS
+
+Others Commands (these will be listed under different menu categories in the help menu)
+
+    idletime: Returns the number of seconds the remote user has been idle
+    keyscan_dump: Dumps the keystroke buffer
+    keyscan_start: Starts capturing keystrokes
+    keyscan_stop: Stops capturing keystrokes
+    screenshare: Allows you to watch the remote user's desktop in real time
+    screenshot: Grabs a screenshot of the interactive desktop
+    record_mic: Records audio from the default microphone for X seconds
+    webcam_chat: Starts a video chat
+    webcam_list: Lists webcams
+    webcam_snap: Takes a snapshot from the specified webcam
+    webcam_stream: Plays a video stream from the specified webcam
+    getsystem: Attempts to elevate your privilege to that of local system
+    hashdump: Dumps the contents of the SAM database
+
+
+
+The hashdump command will list the content of the SAM database. The SAM (Security Account Manager) database stores user's passwords on Windows systems. These passwords are stored in the NTLM (New Technology LAN Manager) format.
+
+The shell command will launch a regular command-line shell on the target system. Pressing CTRL+Z will help you go back to the Meterpreter shell.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
