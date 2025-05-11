@@ -4,10 +4,8 @@ Welcome to my TryHackMe learning repository! Here, I document all my progress, n
 
 ## 📂 Repository Structure
 
-- **`what-i-learned/`**: Personal notes and reflections about the rooms I’ve completed.
 - **`tools/`**: Useful commands and tools I use in TryHackMe rooms (e.g., Nmap, Gobuster, etc.).
-- **`scripts/`**: Any custom scripts I write while solving challenges or automating tasks.
-- **`challenges/`**: Harder or more complex challenges I’ve taken on, including any problems I encountered.
+- **`CTFs/`**: Harder or more complex challenges I’ve taken on, including any problems I encountered.
 
 
 
