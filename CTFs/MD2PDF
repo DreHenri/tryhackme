@@ -1,4 +1,4 @@
-Using gobuster:
+Using **gobuster**:
 gobuster dir -u http://10.10.56.164 -w /usr/share/wordlists/dirbuster/directory-list-2.3-medium.txt
 
 I got this results:
@@ -13,7 +13,7 @@ Forbidden
 This page can only be seen internally (localhost:5000)
 
 
-This localhost gave me an idea. I tried HTML injection:
+This localhost gave me an idea. I tried **HTML injection**:
 <iframe src="http://127.0.0.1:5000/admin"> </iframe>
 
 src="http://127.0.0.1:5000/admin" tells the browser (or in this case, the server rendering the PDF) to load the internal /admin page
