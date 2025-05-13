@@ -1,0 +1,577 @@
+grub2-mkpasswd-pbkdf2, which prompts you to input your password twice and generates a hash for you.
+The resulting hash should be added to the appropriate configuration file depending on the Linux distribution (examples: Fedora and Ubuntu). This configuration would prevent unauthorised users from resetting your root password.
+
+
+
+
+LUKS (Linux Unified Key Setup) is a system that encrypts your data on a hard drive or USB stick so only people with the right password can access it. It’s like putting a secure lock on your data.
+ LUKS Header (phdr)
+This is like the "control room" of LUKS.
+
+Key Material (KM1 to KM8)
+Think of these as slots that store encrypted versions of the master key. Each slot holds a master key encrypted with a different password.
+
+Bulk Data
+This is your actual data (like files and folders) that is encrypted using the master key.
+
+
+
+
+enc_data = encrypt(cipher_name, cipher_mode, key, original_data, length)
+It uses:
+
+    cipher_name: e.g., AES
+
+    cipher_mode: e.g., XTS
+
+    key: The master key
+
+    original_data: Your actual files
+
+    length: How much data to encrypt
+
+
+
+
+You don’t type in the master key directly. Instead, your password is used to create it securely using something called:
+PBKDF2 (or Argon2id)
+
+This is a key derivation function. It makes your password much stronger by:
+
+    Adding a salt (random value)
+
+    Running through a lot of iterations (slow on purpose)
+
+    Giving back a strong key
+
+So even if someone steals your encrypted key, they can’t get your password easily.
+
+
+
+
+ *View USB Drive
+
+lsblk
+blkid
+
+ 
+ *Encrypt the Drive
+
+cryptsetup luksFormat /dev/sdb1
+
+
+
+*Open the Encrypted Drive
+
+cryptsetup luksOpen /dev/sdb1 EDCdrive
+
+
+
+*Format It (Give it a Filesystem)
+
+mkfs.ext4 /dev/mapper/EDCdrive
+
+
+*Mount and Use It
+
+mount /dev/mapper/EDCdrive /media/secure-USB
+
+
+
+Check LUKS Info
+
+cryptsetup luksDump /dev/sdb1
+
+This shows:
+
+    Encryption algorithm (e.g., aes-xts-plain64)
+
+    Key derivation (e.g., PBKDF2 or Argon2id)
+
+    Number of iterations (e.g., 194180 times)
+
+    Key slot info (which passwords are stored)
+
+
+
+
+
+
+
+Firewall
+
+
+Stateless vs. Stateful
+
+    Stateless: Looks at each packet individually. Can be tricked easily.
+
+    Stateful: Remembers connections and knows what's going on. Smarter and safer.
+
+
+
+
+On Linux, you can’t block apps directly (like “only let Firefox access the internet”). You can only block or allow by port.
+
+If you want per-app rules, you need extra tools like SELinux or AppArmor.
+
+
+
+netfilter
+
+    It’s the engine inside the Linux kernel that actually does the filtering.
+
+
+
+
+iptables 
+
+    Works with three chains:
+
+        INPUT: Incoming packets
+
+        OUTPUT: Outgoing packets
+
+        FORWARD: Packets just passing through (not for your computer)
+
+Example: Allow SSH access (port 22)
+
+iptables -A INPUT -p tcp --dport 22 -j ACCEPT
+iptables -A OUTPUT -p tcp --sport 22 -j ACCEPT
+
+To block everything else:
+
+iptables -A INPUT -j DROP
+iptables -A OUTPUT -j DROP
+
+📌 Tip: Run iptables -F to flush (clear) old rules.
+
+
+
+
+
+nftables (modern replacement for iptables)
+
+    Faster, more efficient
+
+    You create tables and chains before adding rules
+
+Example:
+
+nft add table fwfilter
+nft add chain fwfilter fwinput { type filter hook input priority 0 \; }
+nft add chain fwfilter fwoutput { type filter hook output priority 0 \; }
+
+nft add rule fwfilter fwinput tcp dport 22 accept
+nft add rule fwfilter fwoutput tcp sport 22 accept
+
+
+
+
+
+ufw – Uncomplicated Firewall (EASIEST OPTION)
+
+    Makes things super simple
+
+    Best for beginners
+
+Allow SSH:
+
+ufw allow 22/tcp
+
+Check status:
+
+ufw status
+
+Result:
+
+22/tcp ALLOW Anywhere
+
+
+
+
+
+
+How to Stay Safe
+🔐 1. Use Secure Protocols Only
+
+    Never use Telnet or any unencrypted service.
+
+    Always use SSH (Secure Shell) for remote access.
+
+
+
+
+Don’t Allow Root Logins
+
+    By default, SSH allows you to log in as the root user — which is dangerous.
+
+    Disable this in the SSH config file:
+
+/etc/ssh/sshd_config
+
+Add this line:
+
+PermitRootLogin no
+
+
+
+
+
+
+Avoid Passwords — Use SSH Keys Instead
+
+Passwords can be:
+
+    Weak
+
+    Reused
+
+    Easy to guess
+
+    Hard to remember if strong
+
+The better option is: Public Key Authentication
+What is it?
+
+It’s like using a padlock and key:
+
+    You keep the private key (your secret key).
+
+    The server has your public key (your padlock).
+
+If the server sees that your key fits, it lets you in — no password needed.
+
+
+
+
+
+
+🛠 How to Set Up SSH Key Authentication
+
+Generate a key pair on your computer:
+
+ssh-keygen -t rsa
+
+This creates:
+
+    id_rsa (your private key — keep it secret!)
+
+    id_rsa.pub (your public key — can be shared)
+
+Copy your public key to the server:
+
+ssh-copy-id username@server
+
+On the server, in /etc/ssh/sshd_config, make sure:
+
+    PubkeyAuthentication yes
+    PasswordAuthentication no
+
+⚠️ Important:
+Before you disable password authentication, make sure your key-based login works first, or you could lock yourself out of the server!
+
+
+
+
+
+
+
+
+
+🛠 Use sudo Instead of Logging in as Root
+
+What is sudo?
+
+    sudo = Super User Do
+
+    Lets a regular user run commands as root, just for that one command.
+
+    Safer and more controlled than logging in directly as root.
+
+
+
+
+How to Give a User sudo Access?
+
+Depends on your Linux distribution:
+✅ On Debian/Ubuntu:
+
+usermod -aG sudo username
+
+✅ On RedHat/Fedora:
+
+usermod -aG wheel username
+
+This adds the user to the sudoers group (sudo or wheel, depending on the distro).
+
+
+
+
+After setting up a user with sudo, you can disable the root account to prevent anyone from logging in directly as root.
+
+Here’s how:
+
+    Open the /etc/passwd file.
+
+    Find this line:
+
+root:x:0:0:root:/root:/bin/bash
+
+Change it to:
+
+root:x:0:0:root:/root:/sbin/nologin
+
+
+
+
+
+Use the libpwquality library to set password rules.
+On RedHat/Fedora:
+
+Edit:
+
+/etc/security/pwquality.conf
+
+On Debian/Ubuntu:
+
+Install it:
+
+sudo apt install libpam-pwquality
+
+Then edit:
+
+/etc/pam.d/common-password
+
+Example settings:
+
+difok=5         # New password must differ from old by 5 characters
+minlen=10       # Minimum password length
+minclass=3      # Must use 3 character types (e.g., uppercase, lowercase, numbers)
+retry=2         # User gets 2 tries before error
+
+
+
+
+
+How to disable a user:
+
+Edit /etc/passwd and change their shell to /sbin/nologin.
+Example:
+
+Before:
+
+michael:x:1000:1000:Michael:/home/michael:/usr/bin/fish
+
+After:
+
+michael:x:1000:1000:Michael:/home/michael:/sbin/nologin
+
+💡 This stops the user from logging in, but the account still exists (for records or access control).
+
+
+
+
+
+Accounts like www-data, nginx, mongo, etc. are used by background services.
+
+    These accounts should never be able to log in.
+
+    So set their shell to /sbin/nologin too.
+
+This helps reduce damage if there's a Remote Code Execution (RCE) vulnerability — the attacker won't be able to get a shell.
+
+
+
+
+
+
+
+
+🛠️ How to Reduce the Attack Surface
+
+
+Disable Unneeded Services
+
+Only keep what you use.
+If you're not using a service (like a web server or FTP), remove it or disable it.
+
+
+Block Unused Ports with a Firewall
+
+Even if a risky service is installed, a firewall can stop its traffic.
+
+
+
+Hide or disable banner messages that reveal software or OS versions.
+
+
+
+
+
+
+
+
+
+🛠️ Why Updates Are Important
+
+Every piece of software, including the Linux system itself, may have security flaws (vulnerabilities) or bugs. These flaws can:
+
+    Let attackers break into your system
+
+    Cause system crashes or instability
+
+Regular updates fix these problems, often before attackers can take advantage of them.
+
+
+
+
+How to Update Your Linux System
+✅ For Ubuntu/Debian (Debian-based systems):
+
+    Get the latest list of packages:
+
+sudo apt update
+
+Install the new versions:
+
+    sudo apt upgrade
+
+✅ For Red Hat, Fedora, and similar:
+
+    Newer systems (RHEL 8 and later):
+
+sudo dnf update
+
+Older systems (RHEL 7 and earlier):
+
+sudo yum update
+
+
+
+
+
+
+Use Long-Term Support (LTS) Versions
+
+Not all versions of Linux receive updates forever. Some are only supported for a short time.
+📌 Ubuntu LTS
+
+    Ubuntu releases an LTS (Long Term Support) version every 2 years, like:
+
+        18.04
+
+        20.04
+
+        22.04
+
+    Each LTS version gets:
+
+        5 years of free updates
+
+        +5 more years if you get a paid Ubuntu Pro subscription (ESM)
+
+Example:
+
+Ubuntu 14.04 was released in 2014. Its free updates ended in 2019. After that, you need Ubuntu Pro to get security patches.
+
+So if you’re still using Ubuntu 14.04 today, you're not protected unless you’ve paid for extended support — or better yet, upgraded to 22.04.
+
+
+
+
+
+Don’t Forget the Kernel!
+
+The Linux kernel is the core of your system — it manages hardware, memory, and everything else.
+⚠️ Why Kernel Updates Matter:
+
+    In 2016, a serious bug called Dirty COW was found.
+
+    It allowed attackers to gain root access (full control) over a system.
+
+    It affected all kernel versions from 2.6.22 and up.
+
+    It was fixed — but only if you updated your kernel.
+
+✅ So when updating your system, make sure the kernel gets updated too, not just apps and packages.
+
+
+
+
+Set Up Automatic Updates
+Why?
+
+You won’t always remember to update manually. Automating it means you’re always protected.
+Tips:
+
+    Enable automatic updates if your system prioritizes stability (like Ubuntu LTS or RHEL).
+
+    Still keep an eye on security news, in case a critical issue needs fast action.
+
+
+
+
+
+
+
+📂 Where Are Logs Stored?
+
+
+On most Linux systems, logs are stored in the directory:
+
+/var/log
+
+
+## 📄 Important Log Files to Know
+
+| Log File            | What It Shows                                              | Applies To              |
+|---------------------|------------------------------------------------------------|--------------------------|
+| `/var/log/messages` | General system messages (errors, services, etc.)          | Most Linux systems       |
+| `/var/log/auth.log` | All login attempts, sudo commands, SSH logins             | Debian/Ubuntu            |
+| `/var/log/secure`   | Same as `auth.log`, but for RedHat/Fedora systems         | RedHat, CentOS, Fedora   |
+| `/var/log/utmp`     | Info about users currently logged in                      | All                      |
+| `/var/log/wtmp`     | History of user login/logout events                       | All                      |
+| `/var/log/kern.log` | Messages from the Linux kernel (e.g., hardware errors)    | Debian/Ubuntu            |
+| `/var/log/boot.log` | What happened during system startup/boot                  | Most systems             |
+
+
+
+
+
+Logs can be huge, so here are two helpful commands:
+📌 1. tail — Show the End of the Log
+
+Shows the most recent lines (newest events are added at the bottom).
+
+tail -n 12 /var/log/boot.log
+
+➡️ Shows the last 12 lines of boot.log.
+
+
+
+
+📌 2. grep — Search for a Keyword
+
+Find specific messages inside a log file.
+
+grep FAILED /var/log/boot.log
+
+➡️ Shows only the lines in boot.log that contain the word FAILED.
+
+This is useful when you're looking for errors, failed logins, or warnings.
+
+
+
+
+Accessing Logs
+
+System logs often require root access. If you’re not logged in as root, use sudo:
+
+sudo tail /var/log/auth.log
+
+
+
+
+
+
+
