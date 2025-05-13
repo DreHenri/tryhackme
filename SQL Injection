@@ -1,0 +1,106 @@
+Statements:
+
+select * from users;
+
+
+select username,password from users;
+
+
+select * from users LIMIT 1;
+
+
+select * from users where username='admin';
+
+
+select * from users where username != 'admin';
+
+
+select * from users where username='admin' or username='jon';
+
+
+select * from users where username='admin' and password='p4ssword';
+
+
+select * from users where username like 'a%';
+This returns any rows with a username beginning with the letter a.
+
+
+select * from users where username like '%n';
+This returns any rows with a username ending with the letter n.
+
+
+select * from users where username like '%mi%';
+This returns any rows with a username containing the characters mi within them.
+
+
+SELECT name,address,city,postcode from customers UNION SELECT company,address,city,postcode from suppliers;
+The UNION statement combines the results of two or more SELECT statements to retrieve data from either single or multiple tables; 
+the rules to this query are that the UNION statement must retrieve the same number of columns in each SELECT statement, the columns have to be of a similar data type, and the column order has to be the same.
+
+
+
+Using the following SQL Statement, we can gather the results from the two tables and put them into one result set:
+
+SELECT name,address,city,postcode from customers UNION SELECT company,address,city,postcode from suppliers;
+
+
+
+
+INSERT
+The INSERT statement tells the database we wish to insert a new row of data into the table.
+
+insert into users (username,password) values ('bob','password123');
+
+"into users" tells the database which table we wish to insert the data into, "(username,password)" provides the columns we are providing data for 
+and then "values ('bob','password');" provides the data for the previously specified columns.
+
+
+
+
+UPDATE
+The UPDATE statement tells the database we wish to update one or more rows of data within a table. You specify the table you wish to update using "update %tablename% SET" 
+and then select the field or fields you wish to update as a comma-separated list such as "username='root',password='pass123'" then finally, similar to the SELECT statement, 
+you can specify exactly which rows to update using the where clause such as "where username='admin;".
+
+update users SET username='root',password='pass123' where username='admin';
+
+
+
+
+DELETE
+The DELETE statement tells the database we wish to delete one or more rows of data. 
+
+delete from users where username='martin';
+
+
+delete from users;
+Because no WHERE clause was being used in the query, all the data was deleted from the table.
+
+
+
+
+
+
+
+The URL for each blog entry may look something like this:
+
+https://website.thm/blog?id=1
+
+SELECT * from blog where id=1 and private=0 LIMIT 1;
+ the SQL statement above is looking in the blog table for an article with the id number of 1 and the private column set to 0
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
