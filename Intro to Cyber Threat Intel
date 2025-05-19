@@ -1,0 +1,108 @@
+# Cyber Threat Intelligence (CTI)
+
+**Cyber Threat Intelligence (CTI)** can be defined as evidence-based knowledge about adversaries, including their indicators, tactics, motivations, and actionable advice against them.
+
+---
+
+## Threat Intelligence Classifications
+
+- **Strategic Intelligence**  
+  High-level overview that identifies risks, trends, and emerging threats to inform business decisions.
+
+- **Technical Intelligence**  
+  Focuses on attack artifacts and evidence, helping incident response teams understand and defend the attack surface.
+
+- **Tactical Intelligence**  
+  Examines the adversary’s tactics, techniques, and procedures (TTPs) to enhance real-time security controls and address vulnerabilities.
+
+- **Operational Intelligence**  
+  Analyzes adversary intent and specific targets to protect key organizational assets like people, processes, and technology.
+
+---
+
+## Threat Intelligence Lifecycle Phases
+
+1. **Direction**  
+   Define objectives by identifying critical assets, potential impacts, data sources, and required tools. This stage sets the foundation and allows analysts to form investigative questions.
+
+2. **Collection**  
+   Gather relevant threat data from commercial, private, and open-source feeds. Due to high data volume, automation is recommended to improve efficiency and focus on incident triage.
+
+3. **Processing**  
+   Convert raw, unstructured data (logs, malware, traffic) into usable formats. Organize, tag, correlate, and visualize the data using tools like SIEMs for easier analysis.
+
+4. **Analysis**  
+   Evaluate the processed data to uncover threats, determine attack patterns, and guide decisions such as incident response, infrastructure defense, and resource allocation.
+
+5. **Dissemination**  
+   Share the intelligence in formats tailored to stakeholders. Executives get strategic summaries; technical teams receive detailed threat indicators and action plans.
+
+6. **Feedback**  
+   Gather responses from stakeholders to refine the intelligence process and enhance security measures. Continuous feedback ensures the lifecycle remains effective and relevant.
+
+---
+
+## Frameworks
+
+### TAXII (Trusted Automated eXchange of Indicator Information)
+
+A protocol for the secure, automated exchange of cyber threat intelligence to support real-time threat detection and response. It supports two models:
+
+- **Collection Model**: Users request threat intel from a producer using a request-response method.
+- **Channel Model**: Threat intel is automatically pushed to subscribers from a central server using a publish-subscribe system.
+
+### STIX (Structured Threat Information Expression)
+
+A standardized language for describing and sharing cyber threat intelligence. It defines structured relationships between threat elements such as indicators, observables, adversary TTPs, campaigns, and more, enabling consistent and comprehensive threat analysis.
+
+---
+
+## Cyber Kill Chain Phases
+
+1. **Reconnaissance**  
+   - *Purpose*: Gather information about the target.  
+   - *Examples*: Email harvesting, OSINT, social media profiling, network scanning.
+
+2. **Weaponization**  
+   - *Purpose*: Create malware tailored to the attack’s objective.  
+   - *Examples*: Embedding exploits in backdoored documents or executables.
+
+3. **Delivery**  
+   - *Purpose*: Transmit the malicious payload to the victim.  
+   - *Examples*: Phishing emails, malicious links, infected USB devices.
+
+4. **Exploitation**  
+   - *Purpose*: Exploit system vulnerabilities to execute code.  
+   - *Examples*: Exploits like EternalBlue, ZeroLogon.
+
+5. **Installation**  
+   - *Purpose*: Install malware for persistent access.  
+   - *Examples*: Backdoors, password dumpers, Remote Access Trojans (RATs).
+
+6. **Command and Control (C2)**  
+   - *Purpose*: Maintain communication and control over the compromised system.  
+   - *Examples*: C2 frameworks like Empire, Cobalt Strike.
+
+7. **Actions on Objectives**  
+   - *Purpose*: Achieve the attack's end goals.  
+   - *Examples*: Data theft, ransomware deployment, public website defacement.
+
+---
+
+## Diamond Model
+
+The **Diamond Model** is used in threat intelligence to analyze and track cyberattacks by focusing on four interconnected elements:
+
+- **Adversary** – The attacker or threat actor, including their identity and motive.
+- **Victim** – The individual, group, or organization targeted by the adversary.
+- **Infrastructure** – The tools, systems, and platforms used by the adversary and affected systems of the victim.
+- **Capabilities** – The techniques, tactics, and procedures (TTPs) used to exploit the victim and achieve the attacker’s goals.
+
+This model enables analysts to understand the full scope of an intrusion and pivot between elements to link related attacks and uncover broader threat patterns.
+
+
+
+
+
+
+
