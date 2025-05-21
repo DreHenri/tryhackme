@@ -1,6 +1,7 @@
 [Plotted-TMS](https://tryhackme.com/room/plottedtms)
 
 **Difficulty:** Easy
+
 **Objective:** Exploit a vulnerable login with SQL injection, gain shell access via file upload, escalate privileges through a writable cronjob, and read root flag using OpenSSL and doas.
 
 ---
