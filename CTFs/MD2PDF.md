@@ -1,6 +1,7 @@
 [MD2PDF](https://tryhackme.com/room/md2pdf)
 
 **Difficulty:** Easy
+
 **Objective:** Exploit an HTML injection vulnerability to access an internal admin page restricted to localhost, and extract the flag via server-side PDF rendering.
 
 ---
@@ -92,7 +93,9 @@ Root Flag: N/A
 
 ## 10. Notes  
 Time spent: ~10 minutes  
+
 Tools used: gobuster, browser, iframe payloads  
+
 Lessons learned: PDF generators that render HTML can be leveraged to SSRF internal services. Always check rendering context and consider iframe as an SSRF vector when localhost-only services are exposed internally.
 
 
