@@ -1,9 +1,6 @@
 [PHP Exploit - User-Agentt RCE](https://tryhackme.com/room/agentt)
 
-**Author:** your-handle  
-**Date:** 21/05/2025  
-**Platform:** Custom / CTF  
-**Difficulty:** Medium  
+**Difficulty:** Easy 
 **Objective:** Exploit vulnerable PHP version to gain remote code execution and capture the flag.
 
 ---
@@ -52,7 +49,7 @@ Result: Port 80 open, running PHP cli server 5.5 or later (PHP 8.1.0-dev)
 ---
 
 ## 4. Enumeration  
-- Ran gobuster, initially showed nothing  
+- Gobuster, initially showed nothing  
 - Explored the website manually; page was static and non-interactive  
 - Tried XSS and path traversal payloads — nothing worked  
 - Found image URL in GET request: https://source.unsplash.com/Mv9hjnEUHR4/60x60 (stock image, not exploitable)  
