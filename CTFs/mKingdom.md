@@ -1,6 +1,7 @@
 [mKingdom](https://tryhackme.com/room/mkingdom)
 
 **Difficulty:** Easy 
+
 **Objective:** Exploit Concrete5 CMS for remote shell access, escalate privileges via `/etc/hosts` manipulation and SUID bit on bash to retrieve both flags.
 
 ---
