@@ -70,16 +70,16 @@ PORT     STATE SERVICE VERSION
 redis-cli -h 10.10.171.200 -p 6379
 10.10.171.200:6379> help
 redis-cli 7.0.15
-To get help about Redis commands type:
-      "help @<group>" to get a list of commands in <group>
+To get help about Redis commands type:`
+     `"help @<group>" to get a list of commands in <group>
       "help <command>" for help on <command>
       "help <tab>" to get a list of possible help topics
-      "quit" to exit
+      "quit" to exit`
 
-To set redis-cli preferences:
+`To set redis-cli preferences:
       ":set hints" enable online hints
       ":set nohints" disable online hints
-Set your preferences in ~/.redisclirc
+Set your preferences in ~/.redisclirc`
  
  ´
 
