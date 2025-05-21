@@ -91,7 +91,7 @@ Message warned again about destructive OR 1=1 injections
 ---
 
 ## 8. Flags / Proof  
-User Flag: THM{example_flag_here}  
+Hidden  
 Root Flag: N/A
 
 ---
