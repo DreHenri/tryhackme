@@ -109,6 +109,8 @@ Hidden
 
 ## 10. Notes  
 Time spent: ~1 hour
+
 Tools used: nmap, smbclient, enum4linux, ftp, find, GTFOBins  
+
 Lessons learned: Always check for SUID binaries, and don't overlook legacy services like SMBv1 or anonymous FTP/SMB access. These can often provide easy initial footholds or even direct shell access.
 
