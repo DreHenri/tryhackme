@@ -99,7 +99,9 @@ Other Credentials: N/A
 
 ## 10. Notes  
 Time spent: ~30 min
+
 Tools used: nmap, gobuster, curl, Python (requests)  
+
 Lessons learned: Always check the exact version of services; developer versions can introduce dangerous behavior like arbitrary code execution via headers.
 
 
