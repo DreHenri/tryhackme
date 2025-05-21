@@ -1,6 +1,7 @@
 [Lesson Learned?](https://tryhackme.com/room/lessonlearned)
 
 **Difficulty:** Easy 
+
 **Objective:** Identify and exploit SQL injection safely to bypass login and retrieve the flag without triggering destructive queries.
 
 ---
