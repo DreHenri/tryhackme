@@ -1,4 +1,4 @@
-[Dig Dug]
+[Dig Dug](https://tryhackme.com/room/digdug)
 
 **Date:** [21/05/2025]  
 **Difficulty:** [Easy]  
