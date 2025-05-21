@@ -78,6 +78,7 @@ Verified flag content was not accessible externally, only through injected ifram
 
 ## 8. Flags / Proof  
 Hidden
+
 Root Flag: N/A
 
 ---
