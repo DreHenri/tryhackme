@@ -65,7 +65,7 @@ Following the PTES (Penetration Testing Execution Standard):
   - HOSTNAME  
   - GOLANG_VERSION  
   - PATH  
-  - FLAG=flag{7da6c7debd40bd611560c13d8149b647}  
+  - FLAG=flag{7da6c7debd40bd61*************}  
 - Successfully extracted the flag from the `FLAG` environment variable  
 - Key lesson: `env` is very useful in CTFs involving injection
 
