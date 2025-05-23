@@ -82,8 +82,10 @@ Findings:
 
 
 /secret revealed when setting a custom token cookie value
+
 JavaScript exposed /api/items and structure of app
 cmd parameter injectable
+
 
 ----
 
