@@ -1,7 +1,6 @@
 [RootMe](https://tryhackme.com/room/rrootme)
 
-**Date:** [DD/MM/YYYY]  
-**Platform:** [TryHackMe / HackTheBox / PicoCTF / Custom]  
+**Date:** [28/05/2025]  
 **Difficulty:** [Easy]  
 **Objective:** [Reconnaissance, getting a shell, privilege escalation, capture the flag.]
 
